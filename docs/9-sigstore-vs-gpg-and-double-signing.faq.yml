@@ -1,0 +1,43 @@
+id: x-gpg-9-sigstore-vs-gpg-and-double-signing
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: why-rpm-deb-still-gpg
+        question:
+          en: Sigstore exists now — why do RPM / DEB still rely on GPG?
+        answer:
+          en: |
+            Historical compatibility with the OS-native toolchain
+            and a deeper philosophical difference: GPG is a
+            pre-institutional trust mechanism (peer-to-peer, no
+            IdP needed, works for anonymous OSS contributors),
+            while Sigstore is institutional (anchored to an OIDC
+            identity provider like GitHub or Google). RPM, dnf,
+            apt, pacman were all designed with deep OpenPGP
+            integration from day one and remain 100% dependent
+            on GPG keys for package signing; Sigstore has limited
+            OS-level package manager support as of 2026.
+        confidence: 9
+        reference:
+          - docs/9-sigstore-vs-gpg-and-double-signing.en.md
+
+      - id: why-not-unsigned
+        question:
+          en: Why don't publishers usually distribute unsigned raw packages?
+        answer:
+          en: |
+            Two main disadvantages tip the balance against
+            unsigned distribution. Pro: zero key-management
+            overhead, offline re-signing. Con: network transmission
+            and CDN nodes lack cryptographic tamper protection
+            (MITM and package poisoning become trivial); most
+            Linux package managers pop up an error and refuse to
+            install unsigned packages by default. Whether signing
+            with GPG or Sigstore, the principle is the same:
+            ship signed artifacts. The choice between the two is
+            about which ecosystem you're trying to hit.
+        confidence: 9
+        reference:
+          - docs/9-sigstore-vs-gpg-and-double-signing.en.md
