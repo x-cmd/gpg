@@ -3,19 +3,23 @@ Copyright 2026 x-cmd。版权所有，保留所有权利。
 
 
 本仓库公开发布，仅供查看、获取与使用其中的 GPG 公钥进行签名验证。
+所有使用均限于从 x-cmd 官方渠道（GitHub: x-cmd/gpg）获取。
 
 允许（无需事先书面授权）：
 
-  - 通过 HTTPS、git 或其他常规通道访问、下载、缓存本仓库内容
+  - 通过 x-cmd 官方渠道访问、下载本仓库内容
   - 使用 pub/ 下的公钥文件导入本地密钥环（gpg --import 等）
   - 使用上述公钥验证数字签名（gpg --verify、x gpg 等）
   - 在合理范围内引用本仓库的指纹、UID 等元信息用于身份识别
-  - 为上述目的在个人或组织内部镜像本仓库
+  - 在本地机器上缓存已下载的本仓库内容
 
 未经 x-cmd 事先书面授权，禁止：
 
   - 修改本仓库任何内容（含 pub/ 下的公钥文件）
-  - 再分发修改后的版本
+  - 再分发本仓库内容的全部或部分，包括但不限于：
+      · 在第三方服务器上创建公开镜像
+      · 上传至公开 keyserver（如 keys.openpgp.org、keyserver.ubuntu.com）
+      · 捆绑至其他软件包、容器镜像、文档合集等
   - 将本仓库用于商业目的
   - 其他本许可未明确授予的权利
 
@@ -23,14 +27,21 @@ Copyright 2026 x-cmd。版权所有，保留所有权利。
 
 This repository is publicly available solely for the limited
 purpose of fetching and using the GPG public keys under pub/ for
-signature verification. All other rights are reserved by x-cmd.
+signature verification. All access must be from x-cmd's official
+channels (GitHub: x-cmd/gpg).
 
 Without prior written permission from x-cmd, the following are
 prohibited:
 
   - Modifying any content in this repository, including the
     public-key files under pub/
-  - Redistributing modified versions
+  - Redistributing this repository, in whole or in part,
+    including but not limited to:
+      · Operating a third-party mirror of this repository
+      · Uploading the public keys to any public keyserver
+        (e.g. keys.openpgp.org, keyserver.ubuntu.com)
+      · Bundling this repository into other packages, container
+        images, or documentation collections
   - Commercial use of this repository
   - Any other rights not expressly granted above
 
@@ -41,7 +52,15 @@ Note on public-key files:
   The ASCII-armored key files under pub/ are *public* cryptographic
   material — by definition, the public half of an OpenPGP keypair is
   intended for unrestricted distribution for signature verification.
-  The clauses above that grant "access, download, cache, and use for
-  signature verification" apply to those files in particular, and
-  the prohibitions on "modification and redistribution of modified
-  versions" apply to all files in this repository without exception.
+  The clauses above grant the minimum usage rights required for that
+  function (download from official channels, local import, signature
+  verification, local caching). The prohibitions on "modification and
+  redistribution, including third-party mirrors and public keyserver
+  uploads" apply to all files in this repository without exception.
+
+  Practical implication: while the bytes of an OpenPGP public key are
+  technically copyable, x-cmd does not authorize third parties to
+  re-host or re-publish them. Pin your tooling to
+  https://github.com/x-cmd/gpg (and the team's other official
+  channels) as the single source of truth. If you find the keys
+  served from any other domain, treat it as untrusted.

@@ -102,6 +102,14 @@ fingerprint never reappears under a new handle.
 
 ## Security policy
 
+> **Pull from x-cmd's official channels only.** This GitHub
+> repo and the team site are the only authorized sources for
+> the keys under `pub/`. Third-party mirrors, public-keyserver
+> uploads, and bundling into other packages are **not**
+> authorized by the LICENSE — see [`LICENSE`](./LICENSE). If
+> you see these keys served from any other domain, treat them
+> as untrusted.
+
 > **This repository is maintained exclusively by the x-cmd core
 > team.** External PRs that touch `pub/`, `index.tsv`, or any
 > other trust-bearing file will be closed without merge.
@@ -138,8 +146,8 @@ signing keys from a location that's stable, public, and
 *not* signed by itself — circular. (2) Rotations are
 infrequent but security-critical; they want their own
 small, focused repo with its own review surface. (3) `x gpg`
-needs an offline-friendly mirror that doesn't depend on
-cloning the full `x-cmd/x-cmd` monorepo.
+needs a small offline-friendly source for the keys, one that
+doesn't depend on cloning the full `x-cmd/x-cmd` monorepo.
 
 **Why ASCII-armored `.asc` files instead of binary `.gpg`?**
 Armored files survive copy-paste into emails, chat, and the
@@ -160,10 +168,14 @@ in `index.tsv` documenting *what* each key signs. For the
 broader trust-policy document, see the team's site.
 
 **Can I host a mirror?**
-Yes. The repo is small (~3 KB per key), the format is plain
-text, and there's nothing private in it. We don't curate a
-list of mirrors, but `git clone` of the public repo is the
-expected path.
+**No, not without prior written permission.** This repo and
+the team site are the only authorized sources. Third-party
+mirrors, public keyserver uploads (keys.openpgp.org,
+keyserver.ubuntu.com, etc.), and bundling into other packages
+are explicitly forbidden by [`LICENSE`](./LICENSE). The
+reason is the trust-anchor problem: a mirror that serves a
+substituted fingerprint silently breaks every consumer that
+trusts it. Pin your tooling to GitHub.
 
 ## Related
 
