@@ -208,9 +208,11 @@ gpg --import /media/usb/keyring.asc
 
 ### Q8：采用"一年一换"密钥模型，工业界如何解决跨年过渡与历史回滚？
 
-标准模式是 **Trust Anchor Registry（信任锚点注册表）**：
-把每个历年年度公钥合并进单个 keyring，消费者导入一次后
-永久保留。这让"用哪种传输拉 keyring"（curl、shell 模
-块、GitHub Pages 经跳转、气隙环境的摆渡）的选择与
-"keyring 里有哪些密钥"正交 —— 无论怎么运输，历史密钥
-都跟着走。完整答案见文章 0。
+标准模式是 **Trust Anchor Registry（信任锚点注册表）**，
+杠杆点在用户侧的密钥环：发布方把所有历年年度公钥合并进
+单个 keyring，消费者把 keyring 导入自己的 `gpg` 一次并
+长期保留。从此"用哪种传输拉 keyring"（curl、shell 模块、
+GitHub Pages 经跳转、气隙环境的摆渡）的选择与"keyring
+里有哪些密钥"正交 —— 无论怎么运输，历史密钥都跟着走；
+用户的 `gpg` 是用户自己的，供应链策略由用户定。完整答案
+见文章 0。

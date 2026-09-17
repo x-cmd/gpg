@@ -271,18 +271,34 @@ reads as deliberate and intentional.
 
 ### Q7: When the annual key rotates, do consumers' systems need the old key removed?
 
-**No — never auto-remove.** If the enterprise builds automate
-key removal on a year boundary, every host with an older
-artifact installed will start failing its own daily signature
-scans ("signed-by-key unknown"), and a routine security scan
-becomes a production outage. The old key has to stay installed
-alongside the new one.
+**That call is yours.** Whether the old key stays on your
+host or gets pruned at the year boundary is a *user-side*
+decision — the publisher doesn't enforce it. The toolchain
+(`gpg`, `apt`, `dnf`, `rpm`) hands the keyring entirely to
+the operator: once you `gpg --import` something, it's in your
+`~/.gnupg/`, and removing it requires a deliberate
+`gpg --delete-keys`. That puts the supply-chain lever in your
+hands — you decide which publishers' which versions your
+host will accept.
 
-x-cmd's answer: the repo publishes both the current key and
-every historical key in `keyring/archive/`. The team takes no
-position on whether a particular compliance regime should
-eventually prune the archive; that decision, and its operational
-consequences, are left to each operator's security team.
+**What "delete the old key" actually means**: every artifact
+on that host signed by the old key stops verifying the moment
+a routine scan or `dnf check` runs — because the local
+keyring no longer knows who signed it. That's exactly the
+lever a compliance regime wants ("if it wasn't signed by this
+year's key, reject it"), but it's also the lever that turns
+routine scans into paging incidents if the boundary hits a
+host with older artifacts still installed.
+
+**What "keep the old key" means**: every historical artifact
+keeps verifying, but you're now carrying the trust surface of
+every key you've kept, indefinitely.
+
+**The principle**: who controls the local keyring controls
+what verifies locally. That's the GPG design — and the
+control belongs to the user, not the publisher. The
+publisher's role ends at "make the bytes available". The
+operator decides the policy.
 
 ### Q8: A paying enterprise in 2027 wants to install a 2025-era artifact. How is that signed?
 
@@ -301,15 +317,17 @@ term-support re-signing is a paid LTS subscription feature.
 
 ### Q9: Why `x-cmd/gpg` and not `x-cmd/gpgkeyring`?
 
-Brand consistency and zero cognitive load:
+Just personal preference — I think `gpg/keyring` reads better
+than `gpgkeyring`.
 
-- Tool module: `x gpg` (shell command)
-- Public-key repo: `x-cmd/gpg` (this GitHub repo)
-- Official access path: `https://x-cmd.com/gpg/` (via GitHub
-  Pages, see Q10)
-
-Three different surfaces, one word. End-users and CI scripts
-never have to remember which spelling goes where.
+The keys live under a `keyring/` directory inside the
+`x-cmd/gpg` repo, which reads naturally as "x-cmd team's
+GPG keyring, here". `keyring` is also the GnuPG-native word
+for "a collection of public keys" (same word used by
+`gpg --keyring <path>` and `~/.gnupg/pubring.kbx`), so the
+subdirectory name matches upstream vocabulary. Concatenating
+the two words into `gpgkeyring` would lose both the structural
+cue and the alignment with GnuPG terminology.
 
 ### Q10: What's the single shortest import command for x-cmd's trust anchor?
 

@@ -296,12 +296,14 @@ answer.
 
 ### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
 
-The standard pattern is **Trust Anchor Registry**: keep a
-permanent public-key repository combining all historical
-annual public keys into a single keyring, require enterprise
-systems to import both this year's and next year's keys,
-and leave the audit decision of "should we forcibly
-invalidate the old key?" to each operator's own policy. This
-is the mitigation that resolves the old-system-compatibility
+The standard pattern is **Trust Anchor Registry**, with the
+*user's own keyring* as the lever: a publisher-maintained
+data path bundles all historical annual public keys into a
+single keyring; the consumer imports the bundle into their
+own `gpg` and now holds both this year's and next year's
+keys locally; the audit decision of "should I keep this
+key, delete it, or rotate on my own schedule?" sits with
+the user, since the local `gpg` keyring is theirs. This is
+the mitigation that resolves the old-system-compatibility
 friction and dual-signing-dilemma problems from Q7. See
 article 0 for the full answer.

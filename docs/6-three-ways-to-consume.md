@@ -235,12 +235,15 @@ the full answer.
 
 ### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
 
-The standard pattern is **Trust Anchor Registry**: bundle
-every historical annual public key into a single keyring
-that consumers import once and keep installed. This makes
-the choice of "which transport to fetch the keyring from"
-(curl, shell module, GitHub-Pages-via-redirect, sneakernet
-for air-gapped environments) orthogonal to "which keys are
+The standard pattern is **Trust Anchor Registry**, with the
+*user's own keyring* as the lever: the publisher bundles
+all historical annual public keys into a single keyring,
+and the consumer imports the bundle into their own `gpg`
+once and keeps it installed. From that point, the choice
+of "which transport to fetch the keyring from" (curl,
+shell module, GitHub-Pages-via-redirect, sneakernet for
+air-gapped environments) is orthogonal to "which keys are
 in the keyring" — all historical keys travel together,
-regardless of how they're shipped. See article 0 for the
-full answer.
+regardless of how they're shipped. The user's `gpg` keyring
+is theirs; their supply-chain policy is theirs. See article
+0 for the full answer.

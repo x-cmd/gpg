@@ -254,19 +254,19 @@ Web certificates (SSL/TLS).
 
 ### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
 
-The pattern is **Trust Anchor Registry**:
+The pattern is **Trust Anchor Registry**, with the *user's
+own keyring* as the lever:
 
-- **Permanent public-key repository.** A dedicated
-  credential path on the official site (a public data repo
-  or dedicated CDN path) combines all historical annual
-  public keys (`key-2025.gpg`, `key-2026.gpg`, …) into a
-  single keyring.
-- **Control returned to users.** Enterprise systems
-  import both this year's and next year's public keys.
-  The system then has both historical and future keys;
-  regardless of whether an old system is moving to a new
-  version, or a clean system is installing a historical
-  package, the package manager can unlock locally. The
-  ultimate audit decision of "should we forcibly invalidate
-  the old key?" is left to the enterprise's own operations
-  policy.
+- **Public-key repository.** A publisher-maintained data
+  path (a public repo or a dedicated CDN) bundles all
+  historical annual public keys (`key-2025.gpg`,
+  `key-2026.gpg`, …) into a single keyring, so a consumer
+  can pull it once and have every option available.
+- **User-managed keyring.** The consumer imports the bundle
+  into their own `gpg` and now holds both historical and
+  future keys locally. From here, the user owns the
+  supply chain: their `gpg` keyring is theirs, and the
+  policy of "always keep old keys", "delete them at the
+  year boundary", or "rotate on your own schedule" is theirs
+  to set. The publisher's only role is to publish the bytes;
+  the user decides what their local supply chain looks like.

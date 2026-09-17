@@ -208,11 +208,12 @@ the full answer.
 
 ### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
 
-The standard pattern is **Trust Anchor Registry**: keep a
-permanent public-key repository combining every historical
-annual public key into a single keyring, and require
-verifiers to import the historical keys alongside the
-current. That way, an artifact signed by last year's key
-keeps verifying on hosts that only have this year's key
-imported — because they imported the historical keys at
-the same time. See article 0 for the full answer.
+The standard pattern is **Trust Anchor Registry**, with the
+*user's own keyring* as the lever: a publisher-maintained
+data path bundles all historical annual public keys into a
+single keyring, and the consumer imports the bundle into
+their own `gpg`. The artifact signed by last year's key
+keeps verifying locally because *the user chose to keep
+that key* — that's the whole point of the local keyring
+being under the user's control, not the publisher's. See
+article 0 for the full answer.
