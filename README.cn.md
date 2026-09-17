@@ -1,8 +1,8 @@
 # x-cmd/gpg — x-cmd 团队公钥
 
 x-cmd 核心团队的 GPG 公钥集合（权威发布、经团队另行交叉签名）。
-本仓库 `pub/` 目录下以 ASCII-armored 格式（`pub/<handle>.asc`）
-逐一发布；同时合并为 `pub/keys.asc` 串联 keyring，方便一次性
+本仓库 `keyring/` 目录下以 ASCII-armored 格式（`keyring/<handle>.asc`）
+逐一发布；同时合并为 `keyring/keyring.asc` 串联 keyring，方便一次性
 导入。
 
 > 🇬🇧 **English: [README.md](./README.md)** — same catalog,
@@ -35,14 +35,14 @@ x-cmd 核心团队的 GPG 公钥集合（权威发布、经团队另行交叉签
 
 ```sh
 # 下载串联 keyring（每个密钥约 3 KB）
-curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/keys.asc \
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/keyring.asc \
   | gpg --import
 ```
 
 或单个密钥导入：
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/<handle>.asc \
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/<handle>.asc \
   | gpg --import
 ```
 
@@ -52,11 +52,11 @@ curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/<handle>.asc \
 验证需要三步：
 
 1. **获取**：通过你已信任的传输通道拉取 keyring。
-   `https://raw.githubusercontent.com/x-cmd/gpg/main/pub/keys.asc`
+   `https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/keyring.asc`
    在你信任 GitHub 的前提下即可；若需更高保证，可同时从
    团队官网或签名 release tarball 拉取同一文件并对比
    fingerprint。
-2. **导入**：执行 `gpg --import pub/keys.asc`。
+2. **导入**：执行 `gpg --import keyring/keyring.asc`。
 3. **比对**：让导入后输出的 fingerprint 与 `index.tsv` 中
    的值 *以及* 团队官网上的值三方一致。三方一致即为验证
    通过。
@@ -76,22 +76,22 @@ GPG v4 fingerprint 是公钥 packet 的 40 位十六进制 SHA-1。
 
 密钥到期或被轮换时：
 
-1. 旧 `pub/<handle>.asc` 移入
-   `pub/archive/<handle>.<created-date>.asc`。
-2. 新密钥占据 `pub/<handle>.asc` 槽位。
+1. 旧 `keyring/<handle>.asc` 移入
+   `keyring/archive/<handle>.<created-date>.asc`。
+2. 新密钥占据 `keyring/<handle>.asc` 槽位。
 3. `index.tsv` 在同一次提交中更新。
 
-README 的 "Retired keys" 段落由 `pub/archive/` 自动生成。
+README 的 "Retired keys" 段落由 `keyring/archive/` 自动生成。
 轮换要求与密码学过渡声明见 [`CONTRIBUTING.md`](./CONTRIBUTING.md)。
 
-退役密钥永久保留在 `pub/archive/`，并由团队主密钥签名，
+退役密钥永久保留在 `keyring/archive/`，并由团队主密钥签名，
 以便已持有团队主密钥的消费者可验证托管链。退役密钥的
 fingerprint 永远不会以新 handle 形式再次出现。
 
 ## 安全策略
 
 > **仅从 x-cmd 官方渠道直接拉取。** 本 GitHub 仓库与团队官网
-> 是 `pub/` 下密钥的唯二授权来源。**未经授权的代理分发**
+> 是 `keyring/` 下密钥的唯二授权来源。**未经授权的代理分发**
 > —— 第三方公开镜像、通过 CDN / 反向代理 / 缓存代理等第三方
 > 服务（jsdelivr、gcore、statically 等会自动代理
 > raw.githubusercontent.com 的服务均属此列）重新分发、上传至
@@ -99,7 +99,7 @@ fingerprint 永远不会以新 handle 形式再次出现。
 > 见 [`LICENSE`](./LICENSE)。如果你发现这些密钥由其他域名
 > 提供，请视为不可信。
 
-> **本仓库仅由 x-cmd 核心团队维护。** 修改 `pub/`、`index.tsv`
+> **本仓库仅由 x-cmd 核心团队维护。** 修改 `keyring/`、`index.tsv`
 > 或其他承载信任信息的文件的外部 PR 将被直接关闭、不合并。
 
 理由：每一个消费者（`x gpg`、包镜像、release tarball）都
@@ -117,7 +117,7 @@ fingerprint 永远不会以新 handle 形式再次出现。
 
 **Copyright 2026 x-cmd —— 版权所有，保留所有权利。** 完整文本见
 [`LICENSE`](./LICENSE)。本仓库公开发布，仅供查看、获取与使用
-`pub/` 下的 GPG 公钥进行签名验证；所有使用均限于从 x-cmd
+`keyring/` 下的 GPG 公钥进行签名验证；所有使用均限于从 x-cmd
 官方渠道（GitHub: x-cmd/gpg）获取；第三方镜像、上传至公开
 keyserver、再分发至其他软件包等行为未经授权；修改、商业使用
 等其他权利亦需事先获得 x-cmd 的书面授权。

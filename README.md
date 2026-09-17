@@ -2,9 +2,9 @@
 
 The canonical, signed-by-the-team-elsewhere, X-only list of
 GPG public keys for the x-cmd core team. Every key listed
-here is published under `pub/` in this repo as an
-ASCII-armored file (`pub/<handle>.asc`) and aggregated into
-the concatenated `pub/keys.asc` keyring.
+here is published under `keyring/` in this repo as an
+ASCII-armored file (`keyring/<handle>.asc`) and aggregated into
+the concatenated `keyring/keyring.asc` keyring.
 
 > 🌐 **中文版：[README.cn.md](./README.cn.md)** — same catalog,
 > Chinese front matter.
@@ -18,7 +18,7 @@ the concatenated `pub/keys.asc` keyring.
 >   expires or a team member rotates.
 > - **[Security policy](#security-policy)** — short version of
 >   [`CONTRIBUTING.md`](./CONTRIBUTING.md). TL;DR: this repo is
->   maintained by the x-cmd team only; PRs touching `pub/` are
+>   maintained by the x-cmd team only; PRs touching `keyring/` are
 >   closed without merge.
 > - **[FAQ](#faq)** — the questions people actually ask.
 >
@@ -45,14 +45,14 @@ To bulk-import every key in this repo:
 
 ```sh
 # Download the concatenated keyring (~3 KB per key)
-curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/keys.asc \
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/keyring.asc \
   | gpg --import
 ```
 
 Or one key at a time:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/<handle>.asc \
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/<handle>.asc \
   | gpg --import
 ```
 
@@ -62,11 +62,11 @@ A bare fingerprint in a README is **not** a proof — anyone can
 type 40 hex characters. Verification is a three-step process:
 
 1. **Fetch** the key over a transport you already trust.
-   `https://raw.githubusercontent.com/x-cmd/gpg/main/pub/keys.asc`
+   `https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/keyring.asc`
    is fine if you trust GitHub; for higher assurance, fetch the
    same file from a second source (e.g. the team's site, a
    signed release tarball) and compare the resulting fingerprints.
-2. **Import** into GnuPG: `gpg --import pub/keys.asc`.
+2. **Import** into GnuPG: `gpg --import keyring/keyring.asc`.
 3. **Compare** the resulting fingerprint against the value in
    `index.tsv` *and* against the value on the team's website.
    All three sources must agree on the fingerprint — that
@@ -87,11 +87,11 @@ is pinning to a concrete, byte-level commitment, not a name.
 
 ## Key rotation
 
-When a key expires or is rotated, the old `pub/<handle>.asc`
-moves to `pub/archive/<handle>.<created-date>.asc`, the new key
-takes the `pub/<handle>.asc` slot, and `index.tsv` is updated
+When a key expires or is rotated, the old `keyring/<handle>.asc`
+moves to `keyring/archive/<handle>.<created-date>.asc`, the new key
+takes the `keyring/<handle>.asc` slot, and `index.tsv` is updated
 in the same commit. The README's "Retired keys" section is
-generated from `pub/archive/` on every release — see
+generated from `keyring/archive/` on every release — see
 [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the procedure and
 the cryptographic-transition-statement requirement.
 
@@ -104,7 +104,7 @@ fingerprint never reappears under a new handle.
 
 > **Pull from x-cmd's official channels only.** This GitHub
 > repo and the team site are the only authorized sources for
-> the keys under `pub/`. **Proxy redistribution** — third-party
+> the keys under `keyring/`. **Proxy redistribution** — third-party
 > mirrors, CDN / reverse-proxy / caching-proxy re-serving
 > (jsdelivr, gcore, statically, or any service that
 > automatically proxies raw.githubusercontent.com), public-
@@ -114,7 +114,7 @@ fingerprint never reappears under a new handle.
 > them as untrusted.
 
 > **This repository is maintained exclusively by the x-cmd core
-> team.** External PRs that touch `pub/`, `index.tsv`, or any
+> team.** External PRs that touch `keyring/`, `index.tsv`, or any
 > other trust-bearing file will be closed without merge.
 
 The reason: every consumer of these keys — `x gpg`, package
@@ -136,7 +136,7 @@ non-team contributors, in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 **Copyright 2026 x-cmd — All Rights Reserved.** See
 [`LICENSE`](./LICENSE) for the full text. The repository is
 publicly available for the limited purpose of fetching and using
-the GPG public keys under `pub/` for signature verification;
+the GPG public keys under `keyring/` for signature verification;
 modification, redistribution of modified versions, and
 commercial use require prior written permission from x-cmd.
 

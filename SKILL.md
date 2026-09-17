@@ -20,11 +20,11 @@ rationale.
 
 ```sh
 # Whole keyring in one shot (every key the team has published)
-curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/keys.asc \
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/keyring.asc \
   | gpg --import
 
-# One key only — <handle> matches pub/<handle>.asc on disk
-curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/<handle>.asc \
+# One key only — <handle> matches keyring/<handle>.asc on disk
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/<handle>.asc \
   | gpg --import
 
 # Just the manifest, no key bytes
@@ -56,7 +56,7 @@ without the manual curl pipeline.
 
 | # | Col | Type | Example | Meaning |
 |---|---|---|---|---|
-| 1 | handle | str | `lijunhao` | x-cmd handle (matches `pub/<handle>.asc`) |
+| 1 | handle | str | `lijunhao` | x-cmd handle (matches `keyring/<handle>.asc`) |
 | 2 | uid | str | `Li Junhao (x-cmd) <l@x-cmd.com>` | Primary UID from the key |
 | 3 | fingerprint | str | `4E1C 1B9E 5C5F 0A2D 7B3C …` (40 hex, no spaces) | The trust anchor |
 | 4 | created | date | `2024-03-15` | Key creation date (`gpg --list-keys --with-colons`) |
@@ -79,7 +79,7 @@ grep -F "<40-HEX-FINGERPRINT>" index.tsv
 
 # Cross-check a fingerprint in three places (GitHub, team site, your local copy)
 fpr=$(awk -F'\t' '$1=="lijunhao"{print $3}' index.tsv | tr -d ' ')
-curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/pub/lijunhao.asc \
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/lijunhao.asc \
   | gpg --show-keys --with-colons \
   | awk -F: '/^fpr:/{print $10}'
 ```
@@ -99,7 +99,7 @@ recipe:
 
 ```sh
 EXPECTED="4E1C1B9E5C5F0A2D7B3C…"   # copy-pasted from index.tsv column 3
-ACTUAL=$(gpg --show-keys --with-colons pub/keys.asc \
+ACTUAL=$(gpg --show-keys --with-colons keyring/keyring.asc \
   | awk -F: '/^fpr:/{print $10; exit}')
 [ "$EXPECTED" = "$ACTUAL" ] || { echo "FINGERPRINT MISMATCH"; exit 1; }
 ```
@@ -111,8 +111,8 @@ the same pin in a one-liner.
 
 ## Key rotation
 
-When a key is rotated, the old `pub/<handle>.asc` is moved to
-`pub/archive/`. The README's "Retired keys" table is generated
+When a key is rotated, the old `keyring/<handle>.asc` is moved to
+`keyring/archive/`. The README's "Retired keys" table is generated
 from that directory on every release. **Do not** trust a
 retired key for *new* signatures — only for verifying old
 artifacts that pre-date the rotation.
@@ -129,7 +129,7 @@ the consumer's responsibility. The team recommends:
 - **Signing new artifacts:** pin to the *current* fingerprint
   in `index.tsv` (`created` column = most recent).
 - **Signing old artifacts:** pin to the matching fingerprint in
-  `pub/archive/` — the README's retired-table gives the
+  `keyring/archive/` — the README's retired-table gives the
   per-artifact-date fingerprint.
 
 ## Sources
@@ -142,7 +142,7 @@ the consumer's responsibility. The team recommends:
 ## Reporting
 
 - **Doc / README / typo** → [issue](https://github.com/x-cmd/gpg/issues).
-  This repo does not accept external PRs touching `pub/` or
+  This repo does not accept external PRs touching `keyring/` or
   `index.tsv`. Full policy in
   [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 - **Compromised key** → contact the team directly via the
