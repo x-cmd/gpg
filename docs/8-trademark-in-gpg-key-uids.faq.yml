@@ -1,0 +1,23 @@
+id: x-gpg-8-trademark-in-gpg-key-uids
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: what-is-gpg-vs-key
+        question:
+          en: GPG software vs. GPG Key — what's the technical relationship?
+        answer:
+          en: |
+            The UID (User ID) is the human-readable label attached
+            to a GPG keypair — it lives in the public-key packet
+            alongside the cryptographic material but is *not*
+            part of the material itself. Whether you write the
+            UID as "X-CMD (Official Key)", "X-CMD®", or
+            "X-CMD™" makes zero difference to the signature
+            math: same fingerprint, same key bits, same
+            signature validity. The choice is purely about
+            display and (sometimes) legal clarity.
+        confidence: 9
+        reference:
+          - docs/8-trademark-in-gpg-key-uids.en.md
