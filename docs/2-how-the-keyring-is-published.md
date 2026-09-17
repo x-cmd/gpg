@@ -1,30 +1,39 @@
 ---
-x-title: Using a GPG keyring to sign your releases and commits
-x-desc: The publisher's view — generating a keypair, exporting the public half, publishing the keyring under keyring/, keeping index.tsv in sync, configuring rpmsign, batch-signing RPMs, signing git commits and release tarballs, and the CI checks that gate every release.
-x-sidebar: Using a GPG keyring to sign your releases and commits
-x-keywords: gpg --gen-key, gpg --export, git commit -S, git tag -s, rpmsign, gpg-agent, release pipeline, ci verification, rotation, archive, publisher, keyring
+x-title: x-cmd/gpg practice — how we publish and sign releases
+x-desc: The team's actual practice — the file layout, the gpg commands we run, the rpmsign + git-commit/tag signing workflow, the four CI checks that gate every release, and the rotation procedure. Written primarily for our own future reference; readers can adopt or critique via issues.
+x-sidebar: x-cmd/gpg practice
+x-keywords: gpg --gen-key, gpg --export, git commit -S, git tag -s, rpmsign, gpg-agent, release pipeline, ci verification, rotation, archive, x-cmd practice, internal
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: 'Using a GPG keyring to sign your releases and commits'
+      headline: 'x-cmd/gpg practice — how we publish and sign releases'
       inLanguage: 'en'
-      about: 'Signing RPMs, release tarballs, and git commits with GPG'
+      about: 'x-cmd team internal practice for GPG keyring and signing'
 ---
 
-# Using a GPG keyring to sign your releases and commits
+# x-cmd/gpg practice — how we publish and sign releases
 
-The publisher's view: how to use a GPG keyring to put a
-cryptographic signature on every artifact you ship — RPM
-packages, release tarballs, git commits, and release tags.
-Whether you're an open-source maintainer, a release engineer,
-or a CI/CD pipeline author, the same building blocks apply:
-generate a keypair, expose the public half, sign the
-artifact, distribute the public half so consumers can
-verify.
+This document is **the team's practice** — the file layout
+we maintain, the gpg commands we run, the rpmsign and git
+signing workflows we use, the four CI checks that gate
+every release, and the rotation procedure when a key is
+retired.
 
-The article assumes Linux/macOS with `gpg` (or `gpg2`)
-installed and `rpm-build` + `rpm-sign` for the RPM scenario.
+It's intended first as **our own future reference** so that
+any team member (or future maintainer) can pick up the
+pipeline cold. If you're an outside reader and the practice
+is useful to you, please adopt it. If you spot something
+we could do better — a missing step, a sharper command,
+a missed pitfall — **please open an issue**; we appreciate
+the feedback.
+
+> **Status: aspirational + documented for future use.** As
+> of this writing, no actual keys are published in this
+> repo (`index.tsv` is empty; `keyring/` is empty). The
+> practice below describes what we *will* do when we
+> publish the first key. Once we have, we'll update this
+> document to reflect the actual current state.
 
 ## What you'll end up with
 

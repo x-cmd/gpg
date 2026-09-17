@@ -1,27 +1,33 @@
 ---
-x-title: 如何用 keyring 保护你的 release / git commit
-x-desc: 生成密钥对、重导出公钥半、把 keyring 放进 keyring/、保持 index.tsv 同步、配 rpmsign 批量签 RPM、签 release tarball 与 git commit/tag，以及每次发布的 CI 校验。
-x-sidebar: 如何用 keyring 保护 release / git commit
-x-keywords: gpg --gen-key, gpg --export, git commit -S, git tag -s, rpmsign, gpg-agent, 发布流水线, ci 校验, 轮换, archive, 发布者, keyring
+x-title: x-cmd/gpg 实践 —— 我们如何发布与签 release
+x-desc: 团队的实际实践 —— 文件布局、我们跑的 gpg 命令、rpmsign + git commit/tag 签名工作流、每次发布前把关的四项 CI 校验、密钥轮换流程。主要为团队日后参考而写；读者可参考，若我们实践有改进欢迎发 issue。
+x-sidebar: x-cmd/gpg 实践
+x-keywords: gpg --gen-key, gpg --export, git commit -S, git tag -s, rpmsign, gpg-agent, 发布流水线, ci 校验, 轮换, archive, x-cmd 实践, 内部
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: '如何用 keyring 保护你的 release / git commit'
+      headline: 'x-cmd/gpg 实践 —— 我们如何发布与签 release'
       inLanguage: 'zh-CN'
-      about: '用 GPG 签 RPM、release tarball、git commit'
+      about: 'x-cmd 团队 GPG keyring 与签名的内部实践'
 ---
 
-# 如何用 keyring 保护你的 release / git commit
+# x-cmd/gpg 实践 —— 我们如何发布与签 release
 
-本文是发布者视角：如何用 GPG keyring 给发布的每个制品打上
-密码学签名 —— RPM 包、release tarball、git commit、release
-tag。不管你是开源维护者、发布工程师、还是 CI/CD 流水线作者，
-底层套路都一样：生成密钥对、暴露公钥半、签制品、把公钥半分发
-出去让消费者验证。
+本文档是 **团队的实践** —— 我们维护的文件布局、我们跑的
+gpg 命令、我们用的 rpmsign 与 git 签名工作流、每次发布前
+把关的四项 CI 校验、密钥退役时的轮换流程。
 
-本文假设你用的是 Linux/macOS，已装 `gpg`（或 `gpg2`），RPM
-场景还需 `rpm-build` + `rpm-sign`。
+主要作为 **我们自己日后的参考**，让任何团队成员（或未来维
+护者）都能冷启这条流水线。如果你是外部读者且觉得这套实践
+对你有用，请直接采用。如果你看到我们可以做得更好的地方 ——
+漏掉的步骤、更顺的命令、未察觉的坑 —— **请发 issue**；我们
+珍视反馈。
+
+> **状态：前瞻性 + 为日后使用而文档化。** 截至本文撰写
+> 时，本仓库实际未发布任何密钥（`index.tsv` 为空；`keyring/`
+> 为空）。下文描述的是我们 *将要* 采用的实践。一旦发布第一
+> 把密钥，我们会更新本文反映实际当前状态。
 
 ## 你最终会得到什么
 

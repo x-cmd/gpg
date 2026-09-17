@@ -1,30 +1,89 @@
 ---
-x-title: What is GPG and how do I use it?
-x-desc: A practical introduction to GPG for end users — what GPG is, what a GPG key is, the most common scenarios (installing a signed package, verifying a release, importing a public key), the three consumption paths, and pitfalls to avoid.
-x-sidebar: What is GPG and how do I use it?
-x-keywords: gpg, what is gpg, gpg tutorial, public key, private key, gpg key, gpg signature, gpg verify, gpg import, x gpg, end user
+x-title: How x-cmd/gpg protects our users — and how you use it
+x-desc: How the x-cmd team's GPG keyring protects end users from supply-chain attacks, and how to actually consume those keys — install a signed package, verify a release, pin a fingerprint against an independent reference.
+x-sidebar: How x-cmd/gpg protects our users
+x-keywords: gpg, what is gpg, gpg tutorial, public key, private key, gpg key, gpg signature, gpg verify, gpg import, x gpg, end user, supply chain, trust anchor
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: 'What is GPG and how do I use it?'
+      headline: 'How x-cmd/gpg protects our users — and how you use it'
       inLanguage: 'en'
-      about: 'GPG introduction for end users'
+      about: 'How x-cmd/gpg protects end users and how they consume the keyring'
 ---
 
-# What is GPG and how do I use it?
+# How x-cmd/gpg protects our users — and how you use it
 
-A practical introduction to GPG for end users — the
-audience that *consumes* signed software rather than
-publishing it. If you want to install the x-cmd RPM, verify
-a release tarball, or just understand what those fingerprint
-strings mean, this article is for you.
+The x-cmd team's job in shipping this keyring repo is to
+make sure that when you install x-cmd on your machine, you
+have cryptographic proof that the bytes came from us and
+not from an impostor. This article walks you through *how we
+protect you* (what the trust model is, what the team's
+commitments are) and *how you actually use it* (install
+a signed package, verify a release, pin a fingerprint
+against an independent reference).
 
 The article assumes Linux/macOS with `gpg` (or `gpg2`)
 installed. Most distributions ship it by default; if yours
 doesn't, `dnf install gnupg2` / `apt install gnupg2`.
 
-## What is GPG?
+## How we protect you
+
+The trust model is deliberately small and explicit. Three
+things together make the system safe:
+
+1. **The repo is the canonical source.** This repository
+   is the single place the team maintains the keyring. We
+   don't run a separate keyserver, we don't distribute
+   through CDNs. Every byte of the public keys comes from
+   this repo.
+2. **Consumers pull over HTTPS from a domain we control.**
+   `https://raw.githubusercontent.com/x-cmd/gpg/...` and
+   `https://x-cmd.com/gpg/...` are the only two channels
+   the team endorses. Both point at the same bytes — the
+   first is the source, the second is a presentation layer
+   built at deploy time from this repo.
+3. **Consumers pin to the fingerprint against an
+   independent reference.** Importing a key is not
+   enough — the bytes could be wrong. The fingerprint has
+   to match an *independent* source (your own out-of-band
+   knowledge, an `index.tsv` reference, the team site).
+   The three-way Compare — local keyring vs `index.tsv`
+   vs team site — is the load-bearing step.
+
+What the team's commitments look like in practice:
+
+- **Only the team can change `keyring/` or `index.tsv`.**
+  External pull requests are closed without merge. This
+  is a supply-chain principle, not a politeness — a PR
+  that swaps a real fingerprint for a look-alike one is an
+  attack, not a contribution.
+- **Key rotation is the team's responsibility.** When a
+  key expires or rotates, the team publishes the new key
+  in this repo and updates `index.tsv`. The old key
+  remains available in `keyring/archive/` so historical
+  verifications still pass.
+- **Documented in plain language, no marketing.** The
+  docs explain what we do and why. If you find a gap or
+  something we could do better, open an issue — we
+  appreciate the feedback.
+
+What we *don't* do:
+
+- **We don't push to keys.openpgpg.org or
+  keyserver.ubuntu.com.** Keys are distributed through
+  this repo. If you find our key on a public keyserver,
+  someone other than us put it there.
+- **We don't authorize any third-party mirror or CDN
+  proxy.** Pull from `raw.githubusercontent.com` or
+  `x-cmd.com` directly. See the LICENSE footer for the
+  proxy-redistribution clause.
+- **We don't take a position on whether you should keep
+  old keys on your host.** That's a user-side decision;
+  see [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.md)
+  for the philosophy.
+
+## What is GPG, briefly
 
 **GPG** (GNU Privacy Guard) is an open-source encryption
 program that implements the **OpenPGP** standard. It
@@ -37,10 +96,6 @@ operates on — a keypair comprising a **public key** (safe
 to share) and a **private key** (must be kept secret). The
 public key verifies signatures made by the matching
 private key; the private key is what signs things.
-
-The two are inseparable in practice: GPG without keys has
-nothing to encrypt or sign with, and keys without GPG have
-nothing that can perform the cryptographic operations.
 
 If you remember one thing from this article, remember
 this: **a fingerprint is the cryptographic identity of a

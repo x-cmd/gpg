@@ -1,29 +1,87 @@
 ---
-x-title: 什么是 GPG，怎么用？
-x-desc: 面向终端用户的 GPG 实操入门 —— GPG 是什么、GPG 公钥是什么、常见场景（装签名包、校验 release、导入公钥）、三种拉取方式、需要避开的坑。
-x-sidebar: 什么是 GPG，怎么用？
-x-keywords: gpg, 什么是gpg, gpg 教程, 公钥, 私钥, gpg key, gpg 签名, gpg 校验, 导入, x gpg, 终端用户
+x-title: x-cmd/gpg 如何保护用户 —— 以及你如何使用
+x-desc: x-cmd 团队的 GPG keyring 如何保护终端用户免受供应链攻击，以及如何实际使用 —— 装签名包、校验 release、把 fingerprint pin 到独立参考源。
+x-sidebar: x-cmd/gpg 如何保护用户
+x-keywords: gpg, 什么是gpg, gpg 教程, 公钥, 私钥, gpg key, gpg 签名, gpg 校验, 导入, x gpg, 终端用户, 供应链, 信任锚
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: '什么是 GPG，怎么用？'
+      headline: 'x-cmd/gpg 如何保护用户 —— 以及你如何使用'
       inLanguage: 'zh-CN'
-      about: '面向终端用户的 GPG 入门'
+      about: 'x-cmd/gpg 如何保护终端用户以及他们如何使用 keyring'
 ---
 
-# 什么是 GPG，怎么用？
+# x-cmd/gpg 如何保护用户 —— 以及你如何使用
 
-面向终端用户的 GPG 实操入门 —— 受众是 *消费* 已签名软
-件的人，不是发布它的人。如果你想装 x-cmd 的 RPM、校验一
-份下载的 release、或者想理解那些 fingerprint 字符串到底是
-什么，本文就是为你准备的。
+x-cmd 团队发布这个 keyring 仓库的工作是：当你把 x-cmd 装
+到机器上时，让你拿到密码学证据 —— 字节来自我们，而不是来自
+冒充者。本文走查 *我们如何保护你*（信任模型是什么、团队
+承诺是什么）与 *你实际怎么用*（装签名包、校验 release、
+把 fingerprint pin 到独立参考源）。
 
 本文假设你用的是 Linux/macOS，并已装 `gpg`（或
 `gpg2`）。大多数发行版默认装；没装就
 `dnf install gnupg2` / `apt install gnupg2`。
 
-## GPG 是什么？
+## 我们如何保护你
+
+信任模型刻意做得小而显式。三件事一起让系统安全：
+
+1. **本仓库是真源。** 这仓库是团队维护 keyring 的唯
+   一场所。我们不另开 keyserver，不通过 CDN 分发。每
+   一个公钥字节都来自本仓库。
+2. **消费者通过团队自控域名的 HTTPS 拉取。**
+   `https://raw.githubusercontent.com/x-cmd/gpg/...` 与
+   `https://x-cmd.com/gpg/...` 是团队背书的两条唯二渠道。
+   两者指向同一字节 —— 第一条是源，第二条是部署时从本仓
+   库构建出的呈现层。
+4. **消费者把 fingerprint pin 到独立参考源。** 导入密钥
+   是不够的 —— 字节可能错。fingerprint 必须匹配 *独立*
+   来源（你自己的带外知识、`index.tsv` 参考、团队官网）。
+   三方比对 —— 本地密钥环 vs `index.tsv` vs 团队官网
+   —— 是承重的一步。
+
+团队承诺在实际中的样子：
+
+- **只有团队能改 `keyring/` 或 `index.tsv`。** 外部 PR
+  直接关闭、不合并。这是供应链原则，不是客气 —— 一条
+  PR 把真 fingerprint 换成视觉近似的，是攻击，不是贡
+  献。
+- **密钥轮换是团队的责任。** 密钥到期或轮换时，团队
+  在本仓库发布新密钥并更新 `index.tsv`。旧密钥保留在
+  `keyring/archive/` 里，历史校验仍能通过。
+- **用大白话写文档，不做营销。** 文档解释我们做什么
+  和为什么。如果你发现空缺或可改进处，请发 issue ——
+  我们珍视反馈。
+
+我们 *不* 做的事：
+
+- **不上传到 keys.openpgpg.org 或 keyserver.ubuntu.com。**
+  密钥通过本仓库分发。如果你在公开 keyserver 上找到我们
+  的密钥，那是别人放上去的。
+- **不背书任何第三方镜像或 CDN 代理。** 直接从
+  `raw.githubusercontent.com` 或 `x-cmd.com` 拉。代理分发
+  条款见 LICENSE 页脚。
+- **不表态你是否该在主机上保留旧密钥。** 那是用户侧的
+  决定。哲学见 [5. Sigstore、Cosign 与双重签名](./5-sigstore-cosign-and-double-signing.cn.md)。
+
+## GPG 是什么，一句话
+
+**GPG**（GNU Privacy Guard）是一个实现了 **OpenPGP** 标
+准的开源加密程序。它执行密码学动作：加密、解密、生成签名、
+校验签名。它是程序。
+
+**GPG 密钥**是该程序操作的数据凭证 —— 一对密钥，包含
+**公钥**（可公开）与 **私钥**（必须保密）。公钥验证由匹
+配私钥做出的签名；私钥是用来签东西的。
+
+如果你只能记住本文一句话，那应该是：**fingerprint 是密
+钥的密码学身份**。它是你跑 `gpg --list-keys --fingerprint`
+时看到的 40 字符十六进制串（如 `4E1C1B9E5C5F0A2D7B3C...`）。
+两把 fingerprint 相同的密钥按定义就是同一把 —— 没有其他身
+份来源。如果你 pin 到正确的 fingerprint，你就 pin 到了正
+确的密钥。
 
 **GPG**（GNU Privacy Guard）是一个实现了 **OpenPGP** 标准
 的开源加密程序。它执行密码学动作：加密、解密、生成签名、
