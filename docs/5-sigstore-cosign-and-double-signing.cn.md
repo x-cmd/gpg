@@ -24,6 +24,85 @@ Cosign，再对比两种范式，分析 *双重签名* 何时是合理的混
 > **状态：探讨。** 截至本文撰写时，x-cmd 团队尚未在实际
 > 发布签名中采用任一方案。
 
+## 终端用户场景：验证 Sigstore 签名制品
+
+如果你作为终端用户要校验 Sigstore 签名制品（OCI 容器镜像、
+跟 `cosign sign-blob` 输出并列的 blob 等），典型流程如下：
+
+### 场景 A：校验容器镜像
+
+```sh
+# 先装 cosign（https://docs.sigstore.dev/cosign/installation/）
+cosign verify --keyless \
+  ghcr.io/example/app:v1.2.3 \
+  --certificate-identity-regexp '^https://github.com/example/.*$' \
+  --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'
+```
+
+这一步校验：
+
+1. 签名由 Fulcio 颁发的证书产生，证书的 OIDC 颁发者匹配
+   预期（这里是 GitHub Actions）。
+2. 证书中的身份匹配预期 pattern（这里是
+   `github.com/example/` 下任何东西）。
+3. 签名已记入 Rekor 且 inclusion proof 可用。
+4. 镜像摘要与签名的摘要匹配。
+
+预期输出以 `Verified OK` 结尾。任何其他情况 —— `FAILED
+to verify`、OIDC 身份不符 —— 都意味着停下来排查。
+
+### 场景 B：用 detached sig + cert + bundle 校验 blob
+
+对非容器镜像的制品（RPM、release tarball、二进制），发布方
+通常并列发出三个独立文件：
+
+```text
+package.rpm        ← 制品
+package.rpm.sig    ← 签名（二进制或 base64）
+package.rpm.cert   ← Fulcio 证书
+package.rpm.bundle ← Rekor inclusion proof
+```
+
+```sh
+cosign verify-blob \
+  --signature package.rpm.sig \
+  --certificate package.rpm.cert \
+  --bundle package.rpm.bundle \
+  --certificate-identity your-identity \
+  --certificate-oidc-issuer https://your-idp/ \
+  package.rpm
+```
+
+预期输出以 `Verified OK` 结尾。
+
+### 场景 C：交叉比对 OIDC 身份
+
+OIDC 身份是最值得校验的东西 —— 它是 Sigstore 中"发布方"
+的密码学等价物。一个典型 CI 签名身份形如：
+
+```text
+https://github.com/example/app/.github/workflows/release.yml@refs/tags/v1.2.3
+```
+
+发布方告诉你期望签什么；你在 `cosign verify` 里字面 pin。
+如果证书的身份字段不匹配，签名就是别的东西产生的 ——
+可能是当时恰好控制 OIDC 账户的攻击者。
+
+### 终端用户常见坑
+
+- **OIDC 身份 regex 太松。** 类似 `.*example.*` 这样的
+  pattern 接受范围超出你的预期。精确 pin 到你信任的
+  workflow / 仓库。
+- **陈旧的 `--certificate-identity-regexp`。** 如果发布方
+  改了 workflow 文件路径，regex 不再匹配。每次新 release
+  都要更新。
+- **缺 bundle。** 没传 `--bundle`，cosign 会从公共 Rekor
+  拉，对终端用户能用但慢。发离线制品的发布方应把
+  inclusion proof 打包进 bundle。
+- **混淆 Cosign 与 Docker Content Trust。** 是不同的生态；
+  `cosign verify` 不校验 `DOCKER_CONTENT_TRUST` 签名，反之
+  亦然。
+
 ## 一段话总结
 
 **Sigstore** 是一个项目（源自 Google，现为 CNCF 毕业项

@@ -1,15 +1,15 @@
 ---
 x-title: Sigstore, Cosign, and double-signing
-x-desc: What Sigstore is (the project), what Cosign is (the CLI), how Fulcio (CA) and Rekor (transparency log) fit together — and the comparison with GPG, the pre-institutional trust distinction, the double-signing strategy, and when double-signing is worth it. **Project-agnostic; exploratory.**
+x-desc: A single comprehensive Sigstore article — what Sigstore is, what Cosign is, how Fulcio and Rekor fit together; end-user scenarios for verifying Sigstore-signed artifacts; comparison with GPG; the pre-institutional trust distinction; the double-signing strategy and when it's worth it. **Project-agnostic; exploratory.**
 x-sidebar: Sigstore, Cosign, and double-signing
-x-keywords: sigstore, cosign, fulcio, rekor, transparency log, keyless signing, oci, container, slsa, supply chain, gpg vs sigstore, double-signing, dual signing, cncf
+x-keywords: sigstore, cosign, fulcio, rekor, transparency log, keyless signing, oci, container, slsa, supply chain, gpg vs sigstore, double-signing, dual signing, cncf, cosign verify, end user
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
       headline: 'Sigstore, Cosign, and double-signing'
       inLanguage: 'en'
-      about: 'Sigstore / Cosign ecosystem and GPG comparison'
+      about: 'Sigstore / Cosign ecosystem, comparison with GPG, and double-signing'
 ---
 
 # Sigstore, Cosign, and double-signing
@@ -19,12 +19,106 @@ security in 2026. **GPG** has been the de-facto standard for
 signing software since the 1990s; **Sigstore** is a more
 recent (2021+) ecosystem centered on *keyless* signing
 backed by an OIDC identity provider and a public
-transparency log. This article covers Sigstore and Cosign
-in depth, then compares the two paradigms and analyzes
-when *double-signing* both is a reasonable hybrid strategy.
+transparency log. This is the unified Sigstore article —
+ecosystem walkthrough (Cosign / Fulcio / Rekor), end-user
+verification scenarios, comparison with GPG, the
+pre-institutional trust distinction, and the
+double-signing strategy.
 
 > **Status: exploratory.** As of this writing the x-cmd team
 > has not adopted either approach for actual release signing.
+
+## End-user scenarios: verifying Sigstore-signed artifacts
+
+If you're an end user verifying a Sigstore-signed artifact
+(an OCI container image, a blob with `cosign sign-blob`
+output alongside, etc.), the typical flow is:
+
+### Scenario A: verify a container image
+
+```sh
+# Install cosign (https://docs.sigstore.dev/cosign/installation/)
+# Then:
+cosign verify --keyless \
+  ghcr.io/example/app:v1.2.3 \
+  --certificate-identity-regexp '^https://github.com/example/.*$' \
+  --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'
+```
+
+This checks that:
+
+1. The signature was produced by a Fulcio-issued
+   certificate with the expected OIDC issuer (here,
+   GitHub Actions).
+2. The certificate's identity matches the expected
+   pattern (here, anything under `github.com/example/`).
+3. The signature is recorded in Rekor with a valid
+   inclusion proof.
+4. The image's digest matches the signed digest.
+
+The expected output ends with `Verified OK`. Anything else
+— `FAILED to verify`, an unexpected OIDC identity — means
+stop and investigate.
+
+### Scenario B: verify a blob with detached sig + cert + bundle
+
+For artifacts that aren't container images (an RPM, a
+release tarball, a binary), the publisher typically ships
+the signature as three separate files alongside the
+artifact:
+
+```text
+package.rpm        ← the artifact
+package.rpm.sig    ← the signature (binary or base64)
+package.rpm.cert   ← the Fulcio certificate
+package.rpm.bundle ← the Rekor inclusion proof
+```
+
+Verification:
+
+```sh
+cosign verify-blob \
+  --signature package.rpm.sig \
+  --certificate package.rpm.cert \
+  --bundle package.rpm.bundle \
+  --certificate-identity your-identity \
+  --certificate-oidc-issuer https://your-idp/ \
+  package.rpm
+```
+
+The expected output ends with `Verified OK`.
+
+### Scenario C: cross-check the OIDC identity
+
+The OIDC identity is the most important thing to verify —
+it's the cryptographic equivalent of the publisher's
+"signature" for Sigstore. A typical CI signing identity:
+
+```text
+https://github.com/example/app/.github/workflows/release.yml@refs/tags/v1.2.3
+```
+
+The publisher tells you what to expect; you pin to it
+literally in `cosign verify`. If the certificate's identity
+field doesn't match, the signature was produced by
+something else — possibly an attacker who happened to have
+control of the OIDC account at that moment.
+
+### Common pitfalls (end user)
+
+- **Wrong OIDC identity regex.** A too-loose pattern
+  (`.*example.*`) accepts more than you intended. Pin
+  specifically to the workflow / repo you trust.
+- **Stale `--certificate-identity-regexp`.** If the
+  publisher changes the workflow file path, the regex
+  won't match. Update on each new release.
+- **Missing bundle.** Without `--bundle`, cosign falls
+  back to fetching from the public Rekor, which is fine
+  for end users but slower. Publishers shipping offline
+  artifacts should bundle the inclusion proof.
+- **Confusing Cosign with Docker Content Trust.** They're
+  different ecosystems; `cosign verify` doesn't check
+  `DOCKER_CONTENT_TRUST` signatures and vice versa.
 
 ## One-paragraph summary
 
