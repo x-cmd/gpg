@@ -104,11 +104,14 @@ fingerprint never reappears under a new handle.
 
 > **Pull from x-cmd's official channels only.** This GitHub
 > repo and the team site are the only authorized sources for
-> the keys under `pub/`. Third-party mirrors, public-keyserver
-> uploads, and bundling into other packages are **not**
-> authorized by the LICENSE — see [`LICENSE`](./LICENSE). If
-> you see these keys served from any other domain, treat them
-> as untrusted.
+> the keys under `pub/`. **Proxy redistribution** — third-party
+> mirrors, CDN / reverse-proxy / caching-proxy re-serving
+> (jsdelivr, gcore, statically, or any service that
+> automatically proxies raw.githubusercontent.com), public-
+> keyserver uploads, bundling into other packages — is
+> **not** authorized by the LICENSE. See [`LICENSE`](./LICENSE).
+> If you see these keys served from any other domain, treat
+> them as untrusted.
 
 > **This repository is maintained exclusively by the x-cmd core
 > team.** External PRs that touch `pub/`, `index.tsv`, or any
@@ -167,15 +170,21 @@ publishing the public half only, with the `purpose` column
 in `index.tsv` documenting *what* each key signs. For the
 broader trust-policy document, see the team's site.
 
-**Can I host a mirror?**
+**Can I host a mirror, or operate a CDN / proxy that re-serves
+this repo?**
 **No, not without prior written permission.** This repo and
 the team site are the only authorized sources. Third-party
-mirrors, public keyserver uploads (keys.openpgp.org,
-keyserver.ubuntu.com, etc.), and bundling into other packages
-are explicitly forbidden by [`LICENSE`](./LICENSE). The
-reason is the trust-anchor problem: a mirror that serves a
+mirrors, CDN / reverse-proxy / caching-proxy re-serving
+(jsdelivr, gcore, statically, or any service that
+automatically proxies raw.githubusercontent.com), public
+keyserver uploads (keys.openpgp.org, keyserver.ubuntu.com,
+etc.), and bundling into other packages are explicitly
+forbidden by [`LICENSE`](./LICENSE). The reason is the
+trust-anchor problem: a mirror or proxy that serves a
 substituted fingerprint silently breaks every consumer that
-trusts it. Pin your tooling to GitHub.
+trusts it; even an honest CDN cache returns stale bytes
+during a key rotation. Pin your tooling to GitHub and fetch
+directly every time.
 
 ## Related
 

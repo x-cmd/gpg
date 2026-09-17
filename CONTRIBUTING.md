@@ -152,8 +152,11 @@ trust paths — those are the consumer's responsibility, using
 See [`LICENSE`](./LICENSE). **Copyright 2026 x-cmd — All Rights
 Reserved.** The repository is publicly available for the limited
 purpose of fetching and using the GPG public keys under `pub/`
-for signature verification; the bytes must be pulled from x-cmd's
-official channels (this GitHub repo, the team's site) — third-party
-mirrors, public keyserver uploads, and redistribution into other
-packages are not authorized. Modification, commercial use, and
-any rights not expressly granted require prior written permission.
+for signature verification; the bytes must be pulled *directly*
+from x-cmd's official channels (this GitHub repo, the team's site).
+**Proxy redistribution** — third-party mirrors, CDN / reverse-
+proxy / caching-proxy re-serving, public keyserver uploads, and
+bundling into other packages — is explicitly not authorized; the
+trust-anchor rationale is set out in the LICENSE footer.
+Modification, commercial use, and any rights not expressly granted
+require prior written permission.

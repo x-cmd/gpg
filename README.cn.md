@@ -90,11 +90,14 @@ fingerprint 永远不会以新 handle 形式再次出现。
 
 ## 安全策略
 
-> **仅从 x-cmd 官方渠道拉取。** 本 GitHub 仓库与团队官网
-> 是 `pub/` 下密钥的唯二授权来源。第三方镜像、上传至公开
-> keyserver、捆绑至其他软件包等行为均**未经 LICENSE 授权**
-> —— 见 [`LICENSE`](./LICENSE)。如果你发现这些密钥由其他
-> 域名提供，请视为不可信。
+> **仅从 x-cmd 官方渠道直接拉取。** 本 GitHub 仓库与团队官网
+> 是 `pub/` 下密钥的唯二授权来源。**未经授权的代理分发**
+> —— 第三方公开镜像、通过 CDN / 反向代理 / 缓存代理等第三方
+> 服务（jsdelivr、gcore、statically 等会自动代理
+> raw.githubusercontent.com 的服务均属此列）重新分发、上传至
+> 公开 keyserver、捆绑至其他软件包 —— 均**未经 LICENSE 授权**。
+> 见 [`LICENSE`](./LICENSE)。如果你发现这些密钥由其他域名
+> 提供，请视为不可信。
 
 > **本仓库仅由 x-cmd 核心团队维护。** 修改 `pub/`、`index.tsv`
 > 或其他承载信任信息的文件的外部 PR 将被直接关闭、不合并。
@@ -142,11 +145,15 @@ UI；diff 干净；`gpg --import` 两种格式都接受。
 更广义的信任策略文档见团队官网。
 
 **可以自建镜像吗？** **未经事先书面授权不可以。** 本仓库与
-团队官网是唯二授权来源。第三方镜像、上传至公开 keyserver
-（keys.openpgp.org、keyserver.ubuntu.com 等）、捆绑至其他
-软件包等行为被 [`LICENSE`](./LICENSE) 显式禁止。理由是
-信任锚点问题：一旦镜像换掉 fingerprint，所有信任该镜像的
-消费者都会静默被攻破。pin 你的工具链到 GitHub 即可。
+团队官网是唯二授权来源。第三方公开镜像、通过 CDN / 反向
+代理 / 缓存代理等第三方服务重新分发（jsdelivr、gcore、
+statically 等会自动代理 raw.githubusercontent.com 的服务均
+属此列）、上传至公开 keyserver（keys.openpgp.org、
+keyserver.ubuntu.com 等）、捆绑至其他软件包等行为均被
+[`LICENSE`](./LICENSE) 显式禁止。理由是信任锚点问题：一旦
+镜像或代理换掉 fingerprint，所有信任该来源的消费者都会
+静默被攻破；即便是诚实的 CDN 缓存，在密钥轮换期间也会
+返回陈旧字节。pin 你的工具链到 GitHub，每次都直接拉取。
 
 ## 相关
 

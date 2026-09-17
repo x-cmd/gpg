@@ -11,7 +11,12 @@ Two consumption paths. Pick whichever fits the workflow.
 ## 1. Direct curl + gpg (no install)
 
 The repo is plain text + ASCII-armored keyring, served over
-HTTPS from GitHub's raw content CDN.
+HTTPS from GitHub. **Fetch directly from GitHub every time** —
+do not route through any CDN, reverse proxy, or caching
+service (jsdelivr, gcore, statically, etc.). Proxy re-serving
+of this repo is not authorized by [`LICENSE`](./LICENSE) and
+breaks the trust-anchor chain; see the LICENSE footer for the
+rationale.
 
 ```sh
 # Whole keyring in one shot (every key the team has published)

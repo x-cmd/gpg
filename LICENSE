@@ -3,7 +3,7 @@ Copyright 2026 x-cmd。版权所有，保留所有权利。
 
 
 本仓库公开发布，仅供查看、获取与使用其中的 GPG 公钥进行签名验证。
-所有使用均限于从 x-cmd 官方渠道（GitHub: x-cmd/gpg）获取。
+所有使用均限于从 x-cmd 官方渠道（GitHub: x-cmd/gpg）直接获取。
 
 允许（无需事先书面授权）：
 
@@ -16,8 +16,11 @@ Copyright 2026 x-cmd。版权所有，保留所有权利。
 未经 x-cmd 事先书面授权，禁止：
 
   - 修改本仓库任何内容（含 pub/ 下的公钥文件）
-  - 再分发本仓库内容的全部或部分，包括但不限于：
+  - 代理分发本仓库内容的全部或部分，包括但不限于：
       · 在第三方服务器上创建公开镜像
+      · 通过 CDN、反向代理、缓存代理等第三方服务重新分发本仓库
+        内容（如 jsdelivr、gcore、statically 等 GitHub 镜像/代理
+        服务自动代理 raw.githubusercontent.com 的行为均属此列）
       · 上传至公开 keyserver（如 keys.openpgp.org、keyserver.ubuntu.com）
       · 捆绑至其他软件包、容器镜像、文档合集等
   - 将本仓库用于商业目的
@@ -27,17 +30,22 @@ Copyright 2026 x-cmd。版权所有，保留所有权利。
 
 This repository is publicly available solely for the limited
 purpose of fetching and using the GPG public keys under pub/ for
-signature verification. All access must be from x-cmd's official
-channels (GitHub: x-cmd/gpg).
+signature verification. All access must be direct, from x-cmd's
+official channels (GitHub: x-cmd/gpg).
 
 Without prior written permission from x-cmd, the following are
 prohibited:
 
   - Modifying any content in this repository, including the
     public-key files under pub/
-  - Redistributing this repository, in whole or in part,
-    including but not limited to:
+  - **Proxy redistribution** of this repository, in whole or in
+    part, including but not limited to:
       · Operating a third-party mirror of this repository
+      · Re-serving the contents through any CDN, reverse proxy,
+        caching proxy, or similar third-party service
+        (e.g. jsdelivr, gcore, statically, or any other service
+        that automatically proxies raw.githubusercontent.com
+        falls under this clause)
       · Uploading the public keys to any public keyserver
         (e.g. keys.openpgp.org, keyserver.ubuntu.com)
       · Bundling this repository into other packages, container
@@ -54,13 +62,22 @@ Note on public-key files:
   intended for unrestricted distribution for signature verification.
   The clauses above grant the minimum usage rights required for that
   function (download from official channels, local import, signature
-  verification, local caching). The prohibitions on "modification and
-  redistribution, including third-party mirrors and public keyserver
-  uploads" apply to all files in this repository without exception.
+  verification, local caching). The prohibitions on "proxy
+  redistribution, third-party mirrors, and public keyserver uploads"
+  apply to all files in this repository without exception.
 
-  Practical implication: while the bytes of an OpenPGP public key are
-  technically copyable, x-cmd does not authorize third parties to
-  re-host or re-publish them. Pin your tooling to
-  https://github.com/x-cmd/gpg (and the team's other official
-  channels) as the single source of truth. If you find the keys
-  served from any other domain, treat it as untrusted.
+  Rationale (trust anchor): every consumer that pins a fingerprint
+  is implicitly trusting that *the bytes they fetched are the bytes
+  x-cmd published*. A proxy between the consumer and GitHub breaks
+  that chain — even an honest CDN cache can return stale bytes
+  during a rotation, and a malicious proxy can substitute a
+  look-alike fingerprint with no visible difference. The cost of
+  pinning to the wrong source is silent compromise of every release
+  verification done downstream. The only safe answer is: pull
+  directly from https://github.com/x-cmd/gpg, every time, with no
+  intermediate.
+
+  If you find these keys served from any other domain, treat them as
+  untrusted. If you operate a service that automatically proxies
+  raw.githubusercontent.com (or any equivalent path to this repo),
+  you must exclude x-cmd/gpg from that service's coverage.
