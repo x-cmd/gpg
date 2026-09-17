@@ -1,18 +1,53 @@
 ---
-x-title: keyring 如何发布
-x-desc: 团队内部流程 —— 从团队成员机器上的 `gpg --export` 到 `index.tsv` 的一行与 `keyring/keyring.asc` 里的字节。包含文件布局、相关 gpg 命令、每次发布前的 CI 校验。
-x-sidebar: keyring 如何发布
-x-keywords: gpg --export, index.tsv, keyring.asc, 发布流水线, ci 校验, 轮换, archive
+x-title: 如何用 keyring 保护你的 release / git commit
+x-desc: 生成密钥对、重导出公钥半、把 keyring 放进 keyring/、保持 index.tsv 同步、配 rpmsign 批量签 RPM、签 release tarball 与 git commit/tag，以及每次发布的 CI 校验。
+x-sidebar: 如何用 keyring 保护 release / git commit
+x-keywords: gpg --gen-key, gpg --export, git commit -S, git tag -s, rpmsign, gpg-agent, 发布流水线, ci 校验, 轮换, archive, 发布者, keyring
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: 'keyring 如何发布'
+      headline: '如何用 keyring 保护你的 release / git commit'
       inLanguage: 'zh-CN'
-      about: 'x-cmd/gpg 发布流水线'
+      about: '用 GPG 签 RPM、release tarball、git commit'
 ---
 
-# keyring 如何发布
+# 如何用 keyring 保护你的 release / git commit
+
+本文是发布者视角：如何用 GPG keyring 给发布的每个制品打上
+密码学签名 —— RPM 包、release tarball、git commit、release
+tag。不管你是开源维护者、发布工程师、还是 CI/CD 流水线作者，
+底层套路都一样：生成密钥对、暴露公钥半、签制品、把公钥半分发
+出去让消费者验证。
+
+本文假设你用的是 Linux/macOS，已装 `gpg`（或 `gpg2`），RPM
+场景还需 `rpm-build` + `rpm-sign`。
+
+## 你最终会得到什么
+
+读完本文你应该能：
+
+- 用 `gpg --gen-key` 生成密钥对，挑一个 UID（如何写 UID 字符串
+  见 [4. GPG UID 命名约定](./4-gpg-uid-naming-conventions.cn.md)）
+- 把公钥半导出到 `keyring/<handle>.asc`，在 `index.tsv` 追加一行
+- 签 RPM 包（`rpmsign --addsign`）、签 release tarball（`gpg
+  --sign` / `gpg --detach-sign`）、签 git commit（`git commit -S`）、
+  签 git tag（`git tag -s`）
+- 事后对每个签名做本地验证（若同时用 Sigstore 签，参考
+  [5. Sigstore、Cosign 与双重签名](./5-sigstore-cosign-and-double-signing.cn.md)）
+
+## 你会产出的文件布局
+
+```text
+.
+├── keyring/                      # ASCII-armored 公钥，每把密钥一个文件
+│   ├── <handle>.asc          # 文件名 = x-cmd handle（与 index.tsv 一致）
+│   └── keyring.asc           # 串联 keyring，由团队重新生成
+├── index.tsv                 # 5 列清单：handle \t uid \t fingerprint \t created \t purpose
+└── ...
+```
+
+下面进入具体场景。
 
 从"团队成员笔记本上有了一把新 GPG 密钥对"到"`index.tsv`
 里的一行 + `keyring.asc` 里的字节"的流水线刻意做得很小
@@ -161,6 +196,120 @@ fingerprint 永远不会以新 handle 形式再次出现。
 
 这些都不能替代直接导入密钥并把 fingerprint 与独立来源对
 比 —— 但它们给了你审计轨迹。
+
+## 场景：签 git commit 与 tag
+
+除 RPM 包外，同一把密钥对还能签 git commit 与 tag ——
+同把密钥、不同制品。这是 `git commit -S`、`git tag -s`、
+以及 GitHub commit 页面那个"Verified"绿标的底层机制。
+
+### 配置 git 用你的密钥
+
+```sh
+# 告诉 git 用哪把密钥，按 UID 或 fingerprint
+git config --global user.signingkey "<UID-或-fingerprint>"
+
+# 单仓库（如果你不想用 --global）：
+cd /path/to/repo
+git config user.signingkey "<UID-或-fingerprint>"
+```
+
+`git config user.signingkey` 接受完整 UID 字符串或 40 字
+符 fingerprint。fingerprint 更稳（UID 字符串比 fingerprint
+变更多，fingerprint 是密码学锚）。
+
+### 签 commit
+
+```sh
+# 签单个 commit
+git commit -S -m "fix: ..."
+
+# 或给已存在的 commit 补签
+git commit --amend -S --no-edit
+
+# 推送
+git push
+```
+
+`-S` 是 `--gpg-sign` 的简写。推送后，`git verify-commit
+HEAD`（或 `git verify-commit <sha>`）可校验签名。
+
+在 GitHub 上，已签 commit 若 GitHub 能用上传到该用户账户
+的公钥验证签名，会显示绿色"Verified"标签。要让 GitHub 认
+出团队 commit 签名，匹配的公钥必须上传到 **每位开发者的
+GitHub 账户**，或 commit 来自 GitHub 已知的 workflow 签名
+身份（GitHub Actions）。
+
+### 签 tag
+
+```sh
+# 注解 + 签一个 tag
+git tag -s v1.2.3 -m "Release v1.2.3"
+
+# 验证
+git tag -v v1.2.3
+
+# 推送
+git push origin v1.2.3
+```
+
+带签 tag（`-s`）与轻量 tag（`-a` / `-m`）不同：tag 对象本
+身带 OpenPGP 签名块，可用 `git tag -v <tag>` 校验。
+
+### 本地验证
+
+```sh
+# 验证最近的 commit
+git verify-commit HEAD
+
+# 验证 tag
+git tag -v v1.2.3
+```
+
+如果 git 在本地找不到公钥，从团队的
+[`keyring/`](../../keyring/) 导入：
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/x-cmd/gpg/main/keyring/<handle>.asc \
+  | gpg --import
+
+git verify-commit HEAD
+```
+
+### 多开发者共享一把签名密钥
+
+小团队常见模式：**一把共享的 release 签名密钥**（由当前
+负责 release 的人持有），加上每位开发者自己持有的 commit
+签名密钥。
+
+```sh
+# 开发者 A 用自己的密钥签 commit（默认 git config）
+git config user.signingkey "<developer-A-fingerprint>"
+git commit -S -m "..."
+
+# release 工程师用共享密钥打 tag
+git config user.signingkey "<release-key-fingerprint>"
+git tag -s v1.2.3 -m "Release v1.2.3"
+```
+
+这种拆分 —— 每位开发者自己的 commit 签名、一把共享的
+release tag 签名 —— 既保留 commit 级的个人问责，又在
+tagged release 上有消费者可验证的单一权威签名。
+
+### 常见坑（git 签名）
+
+- **"Please tell me who you are."** git 找不到合适的私
+  钥。跑 `gpg --list-secret-keys`，把 `user.signingkey` 设
+  为对应 UID 或 fingerprint。
+- **"gpg: signing failed: Inappropriate ioctl"** 在非交互
+  shell（CI）中。设 `GPG_TTY=$(tty)` 再调 `gpg`，或用
+  `gpg-agent --no-tty`。
+- **`git tag -v` 说 "Can't check signature: No public key"**：
+  校验方的本地密钥环里没有签名者的公钥。从
+  `keyring/<handle>.asc` 导入。
+- **GitHub 不显示"Verified"**：签名者公钥不在推送该 commit
+  的 GitHub 账户上。把公钥上传到该账户的设置里，或从
+  GitHub Actions workflow 推送。
 
 ## 延伸阅读
 
