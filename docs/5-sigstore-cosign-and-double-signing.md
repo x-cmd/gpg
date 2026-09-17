@@ -46,6 +46,8 @@ key the team holds.
 
 ## The three pieces
 
+![cosign](https://repo.x-cmd.io/cosign.svg)
+
 ### Cosign — the CLI
 
 Cosign is the user-facing tool. It does two things: **sign**

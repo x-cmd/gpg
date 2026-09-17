@@ -43,6 +43,8 @@ Google），不是团队持有的密钥。
 
 ## 三块核心
 
+![cosign](https://repo.x-cmd.io/cosign.svg)
+
 ### Cosign —— CLI
 
 Cosign 是面向用户的工具。做两件事：**签名**（产出签名、
