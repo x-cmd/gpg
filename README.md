@@ -8,6 +8,15 @@ the concatenated `keyring/keyring.asc` keyring.
 
 > 🌐 **中文版：[README.cn.md](./README.cn.md)** — same catalog,
 > Chinese front matter.
+
+> 📌 **Maintenance policy.** Like our other repositories, we
+> humbly welcome guidance and feedback from friends — please
+> open an [issue](https://github.com/x-cmd/gpg/issues) if you
+> have suggestions. But for security reasons, **this repo does
+> not accept pull requests** from anyone outside the maintainer
+> group. The repo is maintained by the x-cmd team only. See
+> [CONTRIBUTING.md](./CONTRIBUTING.md) for what counts as
+> in-scope feedback and what's closed without merge.
 >
 > - **[Current keys](#current-keys)** — who, what fingerprint,
 >   what the key signs.
@@ -113,14 +122,22 @@ fingerprint never reappears under a new handle.
 > If you see these keys served from any other domain, treat
 > them as untrusted.
 
-> **This repository is maintained exclusively by the x-cmd core
-> team.** External PRs that touch `keyring/`, `index.tsv`, or any
-> other trust-bearing file will be closed without merge.
+> **This repository is maintained by the x-cmd core team
+> only.** Like our other repos, we welcome feedback and
+> suggestions via [issues](https://github.com/x-cmd/gpg/issues),
+> but **external PRs to any file in this repo will be closed
+> without merge** — docs, prose, `keyring/`, `index.tsv`,
+> all of it. The team writes every commit. See
+> [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 The reason: every consumer of these keys — `x gpg`, package
 mirrors, release tarballs — uses the fingerprint as a trust
 anchor. A malicious PR swapping a real fingerprint for a
 look-alike one is a supply-chain attack, not a contribution.
+For doc-only PRs, the team prefers to write and own its own
+public-key documentation in one voice — and the "this PR is
+benign" check is only possible *after* a merge, by which
+point the bytes are out.
 
 > **Have a suggestion for an article (a key description, a
 > line of docs, a typo)?** Open an

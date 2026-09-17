@@ -7,6 +7,13 @@ x-cmd 核心团队的 GPG 公钥集合（权威发布、经团队另行交叉签
 
 > 🇬🇧 **English: [README.md](./README.md)** — same catalog,
 > English front matter.
+
+> 📌 **维护政策。** 与我们其它仓库一样，我们虚心聆听各位
+> 朋友的指导与建议 —— 如有想法，请开
+> [issue](https://github.com/x-cmd/gpg/issues)。但出于安全
+> 考虑，**本仓库不接受外部 pull request**，只能由维护者
+> 团队维护。哪些反馈在范围内、哪些会被直接关闭，见
+> [CONTRIBUTING.md](./CONTRIBUTING.md)。
 >
 > - **[当前密钥](#当前密钥)**
 > - **[如何验证密钥](#如何验证密钥)**
@@ -99,19 +106,19 @@ fingerprint 永远不会以新 handle 形式再次出现。
 > 见 [`LICENSE`](./LICENSE)。如果你发现这些密钥由其他域名
 > 提供，请视为不可信。
 
-> **本仓库仅由 x-cmd 核心团队维护。** 修改 `keyring/`、`index.tsv`
-> 或其他承载信任信息的文件的外部 PR 将被直接关闭、不合并。
+> **本仓库仅由 x-cmd 核心团队维护。** 与其它仓库一样，
+> 我们虚心聆听各位朋友的指导 —— 反馈与建议欢迎走
+> [issue](https://github.com/x-cmd/gpg/issues) —— 但 **任何
+> 文件的外部 PR 都将被直接关闭、不合并**（文档、行文、
+> `keyring/`、`index.tsv`，全部）。每次 commit 都由团队自
+> 己落笔。详见 [`CONTRIBUTING.md`](./CONTRIBUTING.md)。
 
 理由：每一个消费者（`x gpg`、包镜像、release tarball）都
 把 fingerprint 当作信任锚点。一条把真 fingerprint 换成视觉
-近似值的恶意 PR 就是供应链攻击，不是贡献。
-
-> **对文章（README 中的密钥说明、文档细节、错别字）有建议？**
-> 请发 [issue](https://github.com/x-cmd/gpg/issues)。Issue
-> 公开、可评审，进入团队的文档 backlog。
-
-非团队贡献者的三条具体规则见
-[`CONTRIBUTING.md`](./CONTRIBUTING.md)。
+近似值的恶意 PR 就是供应链攻击，不是贡献。即便只是文档
+PR，团队也倾向于自己持有对外密钥文档的单一声音，且"这
+条 PR 是良性的"只有在 merge 之后才能验证 —— 到那时字节
+已经出去了。
 
 ## License
 

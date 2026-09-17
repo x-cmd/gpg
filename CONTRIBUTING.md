@@ -6,34 +6,46 @@ layout, how a key is published, how `index.tsv` is kept in sync
 with the keys under `keyring/`, and what to do when a key expires
 or is rotated.
 
-## Read this first — security policy
+## Read this first — maintenance policy
 
-> **This repository is maintained exclusively by the x-cmd core
-> team.** External pull requests that change the contents of
-> `keyring/` (add, remove, or replace a public key) will be **closed
-> without merge**, regardless of how the change looks. The
-> reason is straightforward: every consumer of these keys —
-> [`x gpg`](https://x-cmd.com/mod/gpg), `apt`, `dnf`, package
-> mirrors, release tarballs — treats the fingerprint as a trust
-> anchor. A malicious PR that swaps a real fingerprint for a
-> look-alike one is a supply-chain attack, not a contribution.
+> **Like our other repositories, we humbly welcome guidance and
+> feedback from friends.** Please open an
+> [issue](https://github.com/x-cmd/gpg/issues) if you have
+> suggestions — issues are public, reviewable, and feed into
+> the team's documentation backlog. We don't pretend to have all
+> the answers; we do want to hear what's broken, missing, or
+> confusing.
+>
+> **But for security reasons, this repo does not accept pull
+> requests from anyone outside the maintainer group.** This is
+> the strong form of the rule — it applies to *every* file, not
+> just `keyring/` or `index.tsv`. Doc fixes, typo corrections,
+> link fixes, even README prose: all of those go through an
+> issue first, and the team writes the commit. The repo is
+> maintained by the x-cmd team only.
 
-> **Have a suggestion for the article (README, SKILL.md, the
-> per-key description in `index.tsv`)?** Open an
-> [issue](https://github.com/x-cmd/gpg/issues) — issue threads
-> are public, reviewable by anyone, and feed into the team's
-> documentation backlog. **Do not** open a PR for prose changes
-> either; the team prefers to write and own its own public-key
-> documentation in one voice.
+Why the strong form: every consumer of these keys — [`x gpg`](https://x-cmd.com/mod/gpg),
+`apt`, `dnf`, package mirrors, release tarballs — treats the
+fingerprint as a trust anchor. A PR that swaps a real
+fingerprint for a look-alike one is a supply-chain attack,
+not a contribution. Even doc-only PRs are funneled through
+issues because the team prefers to write and own its own
+public-key documentation in one voice, and because "an
+external PR with no security implications" can only be
+verified *after* it's been merged — by which point the
+bytes are out.
 
 Three concrete consequences for non-team contributors:
 
-1. **Bug reports / typos / broken links** — issue, not PR.
+1. **Bug reports / typos / broken links / prose suggestions** —
+   issue, not PR. The team writes the fix in their own
+   commit.
 2. **New key requests** (e.g. "could you add maintainer X?") —
    issue, with the maintainer's public key attached; the team
-   decides whether to publish.
-3. **Anything touching `keyring/*.asc` or `index.tsv`** — issue only;
-   the team regenerates these from its own authoritative source.
+   decides whether to publish and writes the commit.
+3. **Anything touching `keyring/*.asc` or `index.tsv`** —
+   issue only; the team regenerates these from its own
+   authoritative source.
 
 ## Repository layout
 
