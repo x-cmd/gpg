@@ -1,21 +1,21 @@
 ---
-x-title: GPG 密钥 UID 中的商标符号（™/®）—— pro/con
-x-desc: 从四个维度分析 GPG 密钥 User ID 是否应包含商标符号：密码学安全、法律维权、终端编码、开源社区文化。含四种命名约定对比表与推荐默认。**项目中立；纯探讨。**
-x-sidebar: GPG UID 中的商标符号
-x-keywords: gpg, uid, user id, 商标, tm, ®, 包签名, 开源文化, 终端编码, 反钓鱼
+x-title: GPG UID 命名约定
+x-desc: 是否在 GPG 密钥 User ID 中包含商标符号（™/®）的设计决策 —— 四个维度（密码学安全、法律维权、终端编码、开源社区文化）、四种约定对比表与推荐默认。
+x-sidebar: GPG UID 命名约定
+x-keywords: gpg, uid, user id, 商标, tm, ®, 包签名, 开源文化, 终端编码, 反钓鱼, 品牌防御
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: 'GPG 密钥 UID 中的商标符号（™/®）—— pro/con'
+      headline: 'GPG UID 命名约定'
       inLanguage: 'zh-CN'
       about: 'GPG 密钥 User ID 是否应包含商标符号'
 ---
 
-# GPG 密钥 UID 中的商标符号（™/®）—— pro/con
+# GPG UID 命名约定
 
-团队发布包签名 GPG 密钥时迟早会遇到的设计问题：是否在
-密钥的 User ID（UID）里包含商标符号（`™` 或 `®`）。UID 是
+团队发布包签名 GPG 密钥时迟早会遇到的设计问题：是否在密
+钥的 User ID（UID）里包含商标符号（`™` 或 `®`）。UID 是
 消费者跑 `gpg --list-keys` 或任何暴露密钥元数据的 UI 时显
 示的人类可读标签。它 *不* 属于密码学材料 —— fingerprint
 与密钥比特无论如何都不变 —— 但它影响品牌识别、终端渲染，
@@ -25,38 +25,36 @@ x-json-ld:
 学安全、法律 / 商标维权、终端编码兼容性、开源社区文化反
 应。以对比表与一个推荐默认收尾。
 
-> **状态：探讨。** 这是项目中立的分析。x-cmd 团队尚未确
-> 定 UID 约定 —— 一旦确定，结论取决于团队，由下文的权衡
-> 告知。
+## UID 到底是什么？
 
-## 待决定的选项
+GPG 密钥的 UID 是存在 user-id packet 里的 `Name (comment)
+<email>` 标签。密钥持有者可编辑，且不参与任何密码学操作
+—— 校验用 fingerprint，不用 UID 文本。UID 是显示元数据。
 
-团队发布包签名密钥时，在以下 UID 约定之间选：
+典型 UID 约定形如：
 
-- `X-CMD® (Official Package Signing Key) <packages@x-cmd.com>`
-- `X-CMD™ (Official Package Signing Key) <packages@x-cmd.com>`
-- `X-CMD (TM) (Official Package Signing Key) <packages@x-cmd.com>`
-- `X-CMD (Official Package Signing Key) <packages@x-cmd.com>`
+```
+Acme Corporation (Official Package Signing Key) <packages@acme.example>
+```
 
-下文四个维度与具体项目无关 —— 适用于任何决定 UID 约定的
-团队。结尾的推荐是一个站得住脚的默认；面对强品牌防御需
-求的团队可能合理地走到不同结论。
+前半（`Acme Corporation`）是品牌标识；括号（`Official Package
+Signing Key`）是用途标签；尖括号里（`<packages@acme.example>`）
+是联系邮箱 —— 对包签名密钥通常是角色账户而非个人。
 
 ## 维度一 —— 密码学安全
 
 **加不加符号，安全性完全一致。**
 
 `dnf` / `rpm` / `gpg --verify` 验证签名时，比对的是公钥与
-私钥之间的数学关系，不是 UID 字符串。无论 UID 写成
-`X-CMD`、`X-CMD®`、`X-CMD™` 还是 `X-CMD (TM)`，被签名与
-被校验的字节不变。符号只是元数据，对签名有效性、密钥
-fingerprint、信任建立毫无影响。
+私钥之间的数学关系，不是 UID 字符串。无论 UID 写成 `Acme`、
+`Acme®`、`Acme™` 还是 `Acme (TM)`，被签名与被校验的字节
+不变。符号只是元数据，对签名有效性、密钥 fingerprint、信
+任建立毫无影响。
 
 针对恶意替换的真正防御是以下几点的组合：
 - 私钥放在不被公共访问的基础设施之外
 - 公钥通过团队自有域名的 HTTPS 通道交付
-- 消费者把 fingerprint 与独立参考源（本仓库的
-  `index.tsv`、团队官网）锁定
+- 消费者把 fingerprint 与独立参考源锁定
 
 UID 文本与这些都无关。
 
@@ -64,15 +62,15 @@ UID 文本与这些都无关。
 
 加 `™`/`®` 的法律论据大致是：如果起诉冒充者商标侵权，
 本团队自己的脚本上存在这个标记，会让冒充者更难主张"我们
-不知道这是个品牌"或"我们只是用了这个普通词"。该论据在
-某些司法管辖区有力，在另一些则弱。
+不知道这是个品牌"或"我们只是用了这个普通词"。该论据在某
+些司法管辖区有力，在另一些则弱。
 
 **正方（加符号）：**
 
-- 冒充者若照搬 *普通* 的 `X-CMD`，可以合理辩称"这只是通
+- 冒充者若照搬 *普通* 的 `Acme`，可以合理辩称"这只是通
   用技术词、不是品牌"。加上 `™` 或 `®` 让品牌主张一目了
   然，压缩了冒充者的辩驳空间。
-- 冒充者若连 *带符号* 的版本也照搬（`X-CMD™`），就是清
+- 冒充者若连 *带符号* 的版本也照搬（`Acme™`），就是清
   楚的故意冒充证据 —— 显式标记有助于法院认定故意侵权，
   可能提高赔偿额。
 
@@ -99,8 +97,8 @@ UID 文本与这些都无关。
   在任何像样的终端里正确显示。
 - 最小化 / 老旧环境（老版 PuTTY / SecureCRT 配置、某些嵌
   入式发行版、alpine 基础镜像、剥掉 UTF-8 的 CI 日志）中，
-  `®` 比 `™` 大概率会渲染成替换字形（`X-CMD?`、
-  `X-CMD\xAE` 等）。原因是 `®` 落在 Latin-1 补充块
+  `®` 比 `™` 大概率会渲染成替换字形（`Acme?`、
+  `Acme\xAE` 等）。原因是 `®` 落在 Latin-1 补充块
   （0x00A0–0x00FF），有些老代码页把字节 0xA0–0xFF 当控
   制字符；`™` 落在 Unicode 独占块，locale 为 Unicode 时
   通常渲染稳定。
@@ -141,10 +139,10 @@ GPG 密钥 UID 在开源基础设施里通常被读作 *身份标签*，而
 
 | 约定                              | UID 示例                                                  | 兼容 | 法律 | 社区 | 结论 |
 | ---                                | ---                                                       | ---  | --- | ---  | --- |
-| **1. 符号化（`®`）**               | `X-CMD® (Official Package Signing Key) <…>`                | ⚠️ | ✓✓  | –    | 不推荐 —— 编码风险盖过法律收益 |
-| **2. 符号化（`™`）**               | `X-CMD™ (Official Package Signing Key) <…>`                | ⚠️ | ✓✓  | –    | 可接受但无必要 |
-| **3. 纯文本 `(TM)`**               | `X-CMD (TM) (Official Package Signing Key) <…>`            | ✓✓ | ✓   | ≈    | 法律收益是硬需求时可接受 |
-| **4. 纯文本（推荐默认）**         | `X-CMD (Official Package Signing Key) <packages@x-cmd.com>` | ✓✓ | ≈   | ✓✓   | 推荐 |
+| **1. 符号化（`®`）**               | `Acme® (Official Package Signing Key) <…>`                | ⚠️ | ✓✓  | –    | 不推荐 —— 编码风险盖过法律收益 |
+| **2. 符号化（`™`）**               | `Acme™ (Official Package Signing Key) <…>`                | ⚠️ | ✓✓  | –    | 可接受但无必要 |
+| **3. 纯文本 `(TM)`**               | `Acme (TM) (Official Package Signing Key) <…>`            | ✓✓ | ✓   | ≈    | 法律收益是硬需求时可接受 |
+| **4. 纯文本（推荐默认）**         | `Acme (Official Package Signing Key) <packages@acme.example>` | ✓✓ | ≈   | ✓✓   | 推荐 |
 
 列说明：
 
@@ -161,19 +159,18 @@ GPG 密钥 UID 在开源基础设施里通常被读作 *身份标签*，而
 采用 **约定 4** —— 干净、描述性、不带符号：
 
 ```
-X-CMD (Official Package Signing Key) <packages@x-cmd.com>
+Acme (Official Package Signing Key) <packages@acme.example>
 ```
 
 把品牌防御放到对的位置：
 
-- **`TRADEMARK.md`** 在项目仓库（以及团队官网）里 —— 明确
-  的 "X-CMD is a trademark of …" 声明，附注册证引用。这
-  是开源社区期望商标声明出现的标准位置。
+- **`TRADEMARK.md`** 在项目仓库（以及团队官网）里 —— 明
+  确的 "Acme is a trademark of …" 声明，附注册证引用。
 - **团队官网页脚** —— 同样的声明，出现在每一页涉及密钥
   的地方。
 - **Fingerprint pinning** —— 训练消费者把 fingerprint 与
-  独立参考源（`index.tsv`、团队官网）对比，而不是识别
-  UID。UID 是标签；fingerprint 才是信任锚。
+  独立参考源对比，而不是识别 UID。UID 是标签；fingerprint
+  才是信任锚。
 
 这套组合与 Red Hat、SUSE、Canonical、Debian 的做法一致，
 把品牌防御放到真正具有法律与运营效果的位置。
@@ -188,10 +185,9 @@ X-CMD (Official Package Signing Key) <packages@x-cmd.com>
 
 ## 延伸阅读
 
-- [3. 解读密钥目录](./3-reading-the-key-catalog.cn.md) ——
-  fingerprint 是信任锚（不是 UID 文本）。
-- [5. 验证一把密钥](./5-verifying-a-key.cn.md) —— 拉取 →
-  导入 → 比对 的三步法；比对步骤把 fingerprint 与独立参考
-  源交叉核对，这才是真正的反钓鱼防御。
-- [`CONTRIBUTING.md`](../CONTRIBUTING.md) —— 一旦选好
-  UID 约定，密钥如何发布。
+- [1. 什么是 GPG，怎么用？](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
+  终端用户视角；fingerprint 是信任锚。
+- [3. 年度密钥策略](./3-annual-key-strategy-explained.cn.md) ——
+  长期密钥轮换权衡。
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) —— 选定 UID 约定
+  后，密钥如何发布。

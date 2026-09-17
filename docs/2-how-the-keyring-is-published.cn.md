@@ -164,9 +164,9 @@ fingerprint 永远不会以新 handle 形式再次出现。
 
 ## 延伸阅读
 
-- [3. 解读密钥目录](./3-reading-the-key-catalog.cn.md) ——
+- [3. 解读密钥目录](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
   `index.tsv` schema 详解与 fingerprint 数学。
-- [4. 年度密钥策略详解](./4-annual-key-strategy-explained.cn.md) ——
+- [4. 年度密钥策略详解](./3-annual-key-strategy-explained.cn.md) ——
   年度隔离密钥工作流如何接入同一条流水线。
-- [5. 验证一把密钥](./5-verifying-a-key.cn.md) —— 拉取 →
+- [5. 验证一把密钥](./1-what-is-gpg-and-how-do-i-use-it.cn.md) —— 拉取 →
   导入 → 比对 的三步法。

@@ -1,0 +1,54 @@
+id: x-gpg-1-what-is-gpg-and-how-do-i-use-it
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: what-is-gpg-vs-key
+        question:
+          en: GPG software vs. GPG Key — what's the technical relationship?
+        answer:
+          en: |
+            GPG is the program; the keypair is the data credential.
+            GPG performs the cryptographic operations
+            (encrypt, decrypt, sign, verify); the keypair holds
+            the cryptographic material the program operates
+            on. The two are inseparable in practice — GPG
+            without keys has nothing to operate on, and keys
+            without GPG have nothing that can perform the
+            operations.
+        confidence: 9
+        reference:
+          - docs/1-what-is-gpg-and-how-do-i-use-it.en.md
+
+      - id: why-not-unsigned
+        question:
+          en: Why don't publishers usually distribute unsigned raw packages?
+        answer:
+          en: |
+            Because `dnf` / `apt` / `zypper` / `pacman` refuse to
+            install unsigned packages by default, and unsigned
+            distribution has no cryptographic tamper protection
+            during transit (MITM and package poisoning become
+            trivial). As an end user, the absence of a signature
+            on a package you want to install is your first
+            warning that something is wrong.
+        confidence: 9
+        reference:
+          - docs/1-what-is-gpg-and-how-do-i-use-it.en.md
+
+      - id: why-rpm-deb-still-gpg
+        question:
+          en: Sigstore exists now — why do RPM / DEB still rely on GPG?
+        answer:
+          en: |
+            Because the OS-level package managers (`dnf`, `apt`,
+            `zypper`, `pacman`) all natively verify GPG
+            signatures — that's how they've been built since the
+            1990s. Sigstore has limited OS-package-manager
+            support as of 2026. So as an end user installing
+            packages on a typical Linux distribution, GPG is the
+            verification channel you'll encounter.
+        confidence: 9
+        reference:
+          - docs/5-sigstore-cosign-and-double-signing.en.md

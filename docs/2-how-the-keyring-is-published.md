@@ -1,18 +1,18 @@
 ---
-x-title: How the keyring is published
-x-desc: The team-internal pipeline — from a fresh `gpg --export` on a team member's machine to a row in `index.tsv` and an entry in `keyring/keyring.asc`. Includes file layout, the gpg commands involved, and the CI checks that gate every release.
-x-sidebar: How the keyring is published
-x-keywords: gpg --export, index.tsv, keyring.asc, release pipeline, ci verification, rotation, archive
+x-title: Publishing your own GPG keyring
+x-desc: The publisher's view — generating a keypair, exporting the public half, publishing the keyring under keyring/, keeping index.tsv in sync, configuring rpmsign, batch-signing RPMs, and the CI checks that gate every release.
+x-sidebar: Publishing your own GPG keyring
+x-keywords: gpg --gen-key, gpg --export, index.tsv, keyring.asc, rpmsign, gpg-agent, release pipeline, ci verification, rotation, archive, publisher
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: 'How the keyring is published'
+      headline: 'Publishing your own GPG keyring'
       inLanguage: 'en'
-      about: 'x-cmd/gpg release pipeline'
+      about: 'x-cmd/gpg release pipeline (publisher perspective)'
 ---
 
-# How the keyring is published
+# Publishing your own GPG keyring
 
 The pipeline from "team member has a new GPG keypair on their
 laptop" to "row in `index.tsv` and bytes in `keyring.asc`"
@@ -189,11 +189,163 @@ None of these replace importing the key directly and
 checking the fingerprint against an independent source — but
 they do give you the audit trail.
 
+## Scenario: signing RPMs with the published key
+
+Once you've published your key, the most common follow-up
+is using it to sign the artifacts you ship. For RPM-based
+distributions, that's `rpmsign`.
+
+### Prerequisites
+
+You need three things:
+
+1. **The team's signing private key** in your local GPG
+   keyring. The matching public key is in
+   [`keyring/<handle>.asc`](../keyring/); the private half
+   is held by whoever is doing the signing (typically the
+   release CI's secure secret store, or a build engineer's
+   offline laptop).
+2. **`rpm-build` and `rpm-sign` packages** installed:
+
+   ```sh
+   dnf install rpm-build rpm-sign gnupg2
+   ```
+3. **A built `.rpm` file** to sign.
+
+### Importing the signing key
+
+```sh
+# From an exported private-key bundle
+gpg --import /secure/path/to/team-signing-key.private.asc
+
+# Confirm the import
+gpg --list-secret-keys --keyid-format long
+```
+
+The output should list the team's key with both `pub` and
+`sec` rows.
+
+### Configuring rpmsign
+
+Set the key explicitly in `~/.rpmmacros` so you don't rely
+on `gpg-agent`'s "default key" guess:
+
+```text
+# ~/.rpmmacros
+%_gpg_name  Team Name (Package Signing Key) <packages@example.com>
+%_gpgbin    /usr/bin/gpg2
+```
+
+### Signing a single RPM
+
+```sh
+rpmsign --addsign /path/to/x-cmd-1.2.3-1.x86_64.rpm
+```
+
+`--addsign` *adds* a signature without removing existing
+ones — useful for the LTS repackage workflow where you
+want the artifact to carry signatures from both this year's
+key and last year's. To replace all existing signatures,
+use `--resign` instead:
+
+```sh
+rpmsign --resign /path/to/x-cmd-1.2.3-1.x86_64.rpm
+```
+
+### Batch signing (CI / multiple RPMs)
+
+```sh
+for rpm in /build/RPMS/*/*.rpm; do
+  rpmsign --addsign "$rpm"
+done
+```
+
+### Verifying
+
+```sh
+rpm -K /path/to/x-cmd-1.2.3-1.x86_64.rpm
+```
+
+Output should end with `OK`. For verbose output showing the
+signing key's fingerprint and UID:
+
+```sh
+rpm -Kv /path/to/x-cmd-1.2.3-1.x86_64.rpm
+```
+
+Cross-check the signing key's fingerprint against
+[`index.tsv`](../index.tsv) column 3 — that's the
+"three-way fingerprint comparison" workflow.
+
+### Passphrase handling in CI
+
+`rpmsign` invokes `gpg` under the hood, which will prompt
+for the signing key's passphrase on every invocation. For
+human-driven signing, type the passphrase once. For CI /
+batch, use either:
+
+- **`gpg-agent` with a pre-loaded cache.** Start `gpg-agent`
+  in your CI job before invoking `rpmsign`; preset
+  the passphrase via `gpg-preset-passphrase`.
+- **`--passphrase-file <path>`** passed to `rpmsign` (which
+  forwards to `gpg`). Point at a file containing the
+  passphrase. The file should be `chmod 600` and live in
+  the CI's secret store.
+
+### Common release pitfalls
+
+- **"Public key not found" when running `rpm -K`**: import
+  it (e.g., `rpm --import`).
+- **Wrong key selected**: `rpmsign` uses whichever key
+  matches `%_gpg_name` in `~/.rpmmacros`. Always set
+  `%_gpg_name` explicitly in CI.
+- **Multiple signatures**: `--addsign` adds a signature
+  alongside existing ones — both verify. Use `--resign` for
+  a clean release where only the current key is wanted.
+- **Passphrase prompt in CI**: use `gpg-agent` or
+  `--passphrase-file`.
+
+## Putting it together (release CI)
+
+A typical release job:
+
+```sh
+# 1. Import the team's signing key from CI secret store
+echo "$TEAM_SIGNING_KEY_PRIVATE" | gpg --import --batch
+
+# 2. Set up rpmmacros
+cat > ~/.rpmmacros <<EOF
+%_gpg_name  Team Name (Package Signing Key) <packages@example.com>
+EOF
+
+# 3. Pre-load passphrase into gpg-agent
+echo "$TEAM_GPG_PASSPHRASE" \
+  | gpg-preset-passphrase --preset $(gpg --list-secret-keys --with-colons \
+                                       | awk -F: '/^sec/{print $5}')
+
+# 4. Sign every RPM in the build output
+for rpm in /build/RPMS/*/*.rpm; do
+  rpmsign --addsign "$rpm"
+done
+
+# 5. Verify
+rpm -Kv /build/RPMS/*/*.rpm
+
+# 6. Publish to yum repo
+createrepo --update /var/www/repo/
+```
+
+Each step is independently auditable: which key signed
+(step 5 + cross-check vs `index.tsv`), what it signed (the
+file list), when (the release tag).
+
 ## What to read next
 
-- [3. Reading the key catalog](./3-reading-the-key-catalog.md) —
-  the `index.tsv` schema in detail and the fingerprint math.
-- [4. Annual key strategy explained](./4-annual-key-strategy-explained.md) —
-  how the annual-isolation-key workflow plugs into the same pipeline.
-- [5. Verifying a key](./5-verifying-a-key.md) — the three-step
-  fetch → import → compare recipe.
+- [3. Annual key strategy](./3-annual-key-strategy-explained.md) —
+  long-term GPG key rotation trade-offs; pairs with the
+  release pipeline.
+- [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.md) —
+  how to pick the UID string for your key.
+- [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.md) —
+  the modern alternative for cloud-native supply chains,
+  and the case for double-signing both.

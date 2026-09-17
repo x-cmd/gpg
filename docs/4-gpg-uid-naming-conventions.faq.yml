@@ -1,4 +1,4 @@
-id: x-gpg-8-trademark-in-gpg-key-uids
+id: x-gpg-4-gpg-uid-naming-conventions
 
 <data>:
   - name:
@@ -13,11 +13,11 @@ id: x-gpg-8-trademark-in-gpg-key-uids
             to a GPG keypair — it lives in the public-key packet
             alongside the cryptographic material but is *not*
             part of the material itself. Whether you write the
-            UID as "X-CMD (Official Key)", "X-CMD®", or
-            "X-CMD™" makes zero difference to the signature
+            UID as "Acme (Official Key)", "Acme®", or
+            "Acme™" makes zero difference to the signature
             math: same fingerprint, same key bits, same
             signature validity. The choice is purely about
             display and (sometimes) legal clarity.
         confidence: 9
         reference:
-          - docs/8-trademark-in-gpg-key-uids.en.md
+          - docs/4-gpg-uid-naming-conventions.en.md

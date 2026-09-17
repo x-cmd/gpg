@@ -52,7 +52,7 @@ fingerprint 不会。
 都记录在 `index.tsv` 中，都汇总进 `keyring/keyring.asc`。
 完整推理 —— 为何这样拆分、为何密码学上"永不过期"但运营
 上"年度轮换"、重签发机制 —— 见
-[4. 年度密钥策略 —— 设计探讨](./4-annual-key-strategy-explained.cn.md)。
+[4. 年度密钥策略 —— 设计探讨](./3-annual-key-strategy-explained.cn.md)。
 
 ## 三种消费方式
 
@@ -76,18 +76,18 @@ x gpg verify <sig> <file>
 
 ## 延伸阅读
 
-- [1. x-cmd/gpg 为何存在](./1-why-x-cmd-gpg-exists.cn.md) ——
+- [1. x-cmd/gpg 为何存在](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
   本仓库解决的供应链问题
-- [2. keyring 如何发布](./2-how-the-keyring-is-published.cn.md) ——
+- [2. keyring 如何发布](./2-publishing-your-own-gpg-keyring.cn.md) ——
   从 `gpg --export` 到 `index.tsv` 中的一行，团队内部流程
-- [3. 解读密钥目录](./3-reading-the-key-catalog.cn.md) ——
+- [3. 解读密钥目录](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
   `index.tsv` 的每一列、fingerprint 数学、为何以
   fingerprint 为锚
-- [4. 年度密钥策略详解](./4-annual-key-strategy-explained.cn.md) ——
+- [4. 年度密钥策略详解](./3-annual-key-strategy-explained.cn.md) ——
   FAQ Q4–Q8 的长文版
-- [5. 验证一把密钥](./5-verifying-a-key.cn.md) ——
+- [5. 验证一把密钥](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
   拉取 → 导入 → 比对 的三步法
-- [6. 消费 keyring 的三种方式](./6-three-ways-to-consume.cn.md) ——
+- [6. 消费 keyring 的三种方式](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
   原生 curl、`x gpg`、GitHub Pages → x-cmd.com 跳转
 
 技术参考（文件布局、schema、CI）见

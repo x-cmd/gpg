@@ -190,10 +190,10 @@ rpm -K x-cmd-annual-2026.rpm
 
 ## 延伸阅读
 
-- [5. 验证一把密钥](./5-verifying-a-key.cn.md) —— 拉取 →
+- [5. 验证一把密钥](./1-what-is-gpg-and-how-do-i-use-it.cn.md) —— 拉取 →
   导入 → 比对 的三步法，含视觉近似与 CDN 缓存陷阱。
-- [6. 消费 keyring 的三种方式](./6-three-ways-to-consume.cn.md) ——
+- [6. 消费 keyring 的三种方式](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
   原生 curl、`x gpg`、GitHub Pages 经 x-cmd.com 跳转。
-- [7. 用 GPG 给 RPM 包签名](./7-signing-an-rpm-with-gpg.cn.md) ——
+- [7. 用 GPG 给 RPM 包签名](./2-publishing-your-own-gpg-keyring.cn.md) ——
   上文 repackage / resign 生命周期在发布时会调用的
   `rpmsign` 实操教程。
