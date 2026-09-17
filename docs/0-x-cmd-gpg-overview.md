@@ -38,24 +38,29 @@ The live table is regenerated from
 team. Pin to the **fingerprint**, not the handle — handles can
 be re-used across rotations; fingerprints cannot.
 
-## Two published keys per team (FAQ Q4)
+## Two published keys per team (FAQ Q4) — *candidate design*
 
-The team's supply-chain keying strategy publishes two signing
-keys, each with a different operational role:
+A supply-chain keying design the x-cmd team is considering
+publishes two signing keys, each with a different operational
+role. **As of this writing no such keys exist in
+`index.tsv`** — this section describes a *candidate* design,
+not a current state.
 
-- **Community key** — signs the standard community package
-  (`x-cmd.rpm` / `x-cmd.deb`). One import, every future
-  upgrade verifies silently.
-- **Annual key (`key-<year>`)** — signs the per-year enterprise
+- **Community key** — would sign the standard community package
+  (`x-cmd.rpm` / `x-cmd.deb`). One import, every future upgrade
+  verifies.
+- **Annual key (`key-<year>`)** — would sign the per-year
   compliance package (`x-cmd-annual-<year>.rpm`). Strict year-
   on-year isolation for finance / government procurement
   audits.
 
-Both keys live in this repo under [`keyring/`](../keyring/),
-aggregated into [`keyring/keyring.asc`](../keyring/keyring.asc).
-The articles below cover why this split, why "no expiry"
-cryptographically but "annual rotation" operationally, and the
-repackage / resign lifecycle that paid LTS customers rely on.
+Under this candidate design, both keys would live in this
+repo under [`keyring/`](../keyring/), aggregated into
+[`keyring/keyring.asc`](../keyring/keyring.asc). The full
+rationale — why this split, why "no expiry" cryptographically
+but "annual rotation" operationally, the repackage / resign
+lifecycle — lives in
+[4. Annual key strategy — design exploration](./4-annual-key-strategy-explained.md).
 
 ## How to consume (three paths)
 

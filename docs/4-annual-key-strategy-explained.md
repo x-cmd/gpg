@@ -1,68 +1,80 @@
 ---
-x-title: Annual key strategy explained
-x-desc: The long-form version of FAQ Q4–Q8 — the two published keys (community + annual), why "no expiry" cryptographically but "annual rotation" operationally, and the repackage / resign lifecycle for users who need an older artifact re-signed with the current year's key.
-x-sidebar: Annual key strategy explained
-x-keywords: annual key, enterprise, supply chain, no-expiry, rotation, repackage, resign, lts, annual isolation, key-2026
+x-title: Annual key strategy — design exploration
+x-desc: A design the x-cmd team is considering: the two-key split (community + annual), why "no expiry" cryptographically but "annual rotation" operationally, and the repackage / resign lifecycle for users who need an older artifact re-signed with the current year's key. **Exploratory only — not yet implemented.**
+x-sidebar: Annual key strategy — design exploration
+x-keywords: annual key, enterprise, supply chain, no-expiry, rotation, repackage, resign, lts, annual isolation, key-2026, design exploration
 x-json-ld:
   '@context': https://schema.org
   '@graph':
     - '@type': TechArticle
-      headline: 'Annual key strategy explained'
+      headline: 'Annual key strategy — design exploration'
       inLanguage: 'en'
-      about: 'x-cmd supply-chain keying strategy'
+      about: 'x-cmd supply-chain keying strategy under exploration'
 ---
 
-# Annual key strategy explained
+# Annual key strategy — design exploration
 
-The team's supply-chain keying strategy looks unusual from the
-outside — two published keys instead of one, with one of them
-rotated every calendar year but cryptographically set to
-never expire. This article is the long-form rationale. It
-walks through why the strategy has the shape it does, what
-each design decision defends against, and where the
-intentional gaps are.
+> **Status: exploratory.** As of this writing the x-cmd team
+> has not yet adopted a multi-key release pipeline. This
+> article walks through a *candidate* design — what the
+> two-key split would look like, why "no expiry"
+> cryptographically but "annual rotation" operationally is a
+> defensible shape, and how the repackage / resign lifecycle
+> would work — and is offered as analysis, not as a description
+> of what is in production today. Treat the rest of the
+> article as "if we adopted this design, here's how it would
+> behave and what trade-offs it would create."
 
-## The two-key model
+The candidate design has two parts that look unusual at
+first glance: two published keys instead of one, with one
+of them rotated every calendar year but cryptographically
+set to never expire. This article is the long-form
+analysis. It walks through why the design has the shape it
+would, what each design decision defends against, and where
+the intentional gaps would be.
 
-Every release ships two signed artifacts:
+## The two-key model (candidate)
+
+Under this design, every release would ship two signed
+artifacts:
 
 | Artifact                          | Signed by         | Purpose                                                              |
 | ---                               | ---               | ---                                                                  |
 | `x-cmd.rpm` / `x-cmd.deb`         | `official` key    | Community edition. One import, every future upgrade verifies silently. |
 | `x-cmd-annual-<year>.rpm` / `.deb`| `key-<year>` key  | Compliance edition. Annual isolation for finance / government audits.   |
 
-Both keys live in this repo under `keyring/`, both are
-documented in `index.tsv`, both are aggregated into
-`keyring/keyring.asc`. The team publishes both because the
-two audiences have different threat models and operational
-constraints — bundling them into a single key would force
-one audience to accept the other's trade-offs.
+Both keys would live in this repo under `keyring/`, both
+documented in `index.tsv`, both aggregated into
+`keyring/keyring.asc`. The design calls for publishing both
+because the two audiences have different threat models and
+operational constraints — bundling them into a single key
+would force one audience to accept the other's trade-offs.
 
-The community edition optimizes for **friction-free
+The community edition would optimize for **friction-free
 upgrades**. A user installs the package once, the master key
 gets imported, and every subsequent package — including
 security patches, point releases, and version bumps —
-verifies silently without any user intervention. There is
-no "renew your key every year" chore, and there is no
+verifies silently without any user intervention. There would
+be no "renew your key every year" chore, and no
 calendar-bound moment where an unattended host suddenly
 starts failing signature checks.
 
-The enterprise / compliance edition optimizes for **strict
-year-on-year auditability**. A finance or government team
-needs to be able to say "everything we deployed in 2026 was
-signed by the 2026 isolation key, and that key never signed
-anything from 2025 or 2027". The cost is a once-a-year key
-rotation; the benefit is a clean per-year audit trail.
+The annual edition would optimize for **strict year-on-year
+auditability**. A finance or government team needs to be
+able to say "everything we deployed in 2026 was signed by
+the 2026 isolation key, and that key never signed anything
+from 2025 or 2027". The cost is a once-a-year key rotation;
+the benefit is a clean per-year audit trail.
 
 ## "No expiry" cryptographically, "annual" operationally
 
-The most counterintuitive piece of the strategy is the
-annual key's expiry: it has **none**. Cryptographically, the
-private key is set to never expire. Operationally, the team
-treats it as if it had — the `key-2026` private key only
-signs 2026 artifacts, and at the year boundary the team
-"seals" it (renders it unusable for new signatures) and
-moves to `key-2027`.
+The most counterintuitive piece of the design is the annual
+key's expiry: it would have **none**. Cryptographically, the
+private key would be set to never expire. Operationally, it
+would be treated as if it had — the `key-2026` private key
+only signs 2026 artifacts, and at the year boundary the
+private half is "sealed" (rendered unusable for new
+signatures) and `key-2027` takes over.
 
 Two competing forces drive this:
 
@@ -85,20 +97,22 @@ are mid-upgrade, mid-rollback, or simply unattended. A
 production environment is a paging incident waiting to
 happen, and a service-credit dispute waiting to be filed.
 
-### The compromise
+### The compromise under consideration
 
-The team picks the best of both: **no cryptographic expiry,
+The design picks the best of both: **no cryptographic expiry,
 strict operational isolation**. The `key-2026` private key
-never expires on the wire; clients with installed artifacts
-spanning the 2026 → 2027 boundary keep verifying both. But
-the team physically seals the key at year-end so it can't
-sign anything new, and a fresh `key-2027` takes over for
-2027's artifacts. Every year-bound audit trail stays clean
-because no artifact is signed by both keys.
+would never expire on the wire; clients with installed
+artifacts spanning the 2026 → 2027 boundary would keep
+verifying both. But the private half is physically sealed at
+year-end so it can't sign anything new, and a fresh
+`key-2027` takes over for 2027's artifacts. Every year-bound
+audit trail stays clean because no artifact is signed by both
+keys.
 
-Consumers verify artifacts spanning the rotation without ever
-hitting a "key expired" error, while every year-bound audit
-log is unambiguous about which key signed what.
+Consumers would verify artifacts spanning the rotation
+without ever hitting a "key expired" error, while every
+year-bound audit log is unambiguous about which key signed
+what.
 
 ## Why not 398 / 397 / 380 days
 
@@ -108,7 +122,7 @@ shortened public-TLS lifetimes through 2026 to under 200
 days. Code-signing is a separate ecosystem and is not bound
 by that timeline, but reusing the old 398-day number in a
 code-signing context reads as a copy-paste from the wrong
-standard. A sharp-eyed security reviewer will treat the
+standard. A sharp-eyed security reviewer would treat the
 overall posture review as "the team doesn't understand
 which standards apply to which".
 
@@ -120,7 +134,7 @@ their annual audit cycles — the technical rotation
 coincides with the business year, which makes the rotation
 explainable to non-technical stakeholders.
 
-## Never auto-remove old keys on rotation
+## Old keys stay available after rotation
 
 If a consumer's automation removes the old annual key at
 the year boundary, every host with an older artifact
@@ -128,11 +142,13 @@ installed will start failing its own daily signature scans
 ("signed-by-key unknown"), and a routine security scan
 becomes a production outage.
 
-The team's position is: keep both keys installed. The repo
-publishes both the current key (in `keyring/`) and every
-historical annual key (in `keyring/archive/`). Consumers
-can verify artifacts spanning the rotation without ever
-hitting a "key missing" error.
+The design's neutral stance: the repo publishes both the
+current key (in `keyring/`) and every historical annual key
+(in `keyring/archive/`). Consumers can verify artifacts
+spanning the rotation without ever hitting a "key missing"
+error. This is the autonomy we leave to the user — the
+team's role ends at "make the bytes available"; the operator
+decides the local policy.
 
 If a particular compliance regime requires eventual pruning
 of historical keys, that's the operator's call to make on
@@ -140,7 +156,7 @@ their own hosts — the team takes no position on it. The
 "incompatibility-with-your-compliance" pot belongs to the
 operator who made the choice.
 
-## Repackage / resign lifecycle
+## Repackage / resign lifecycle (under consideration)
 
 An enterprise customer in 2027 wants to install a 2025-era
 artifact. The artifact's original signature was made by
@@ -148,23 +164,23 @@ artifact. The artifact's original signature was made by
 if they have it, they may want the artifact re-signed under
 `key-2027` so their 2027 audit log is clean.
 
-The team supports this through **repackage / resign
+The design supports this through **repackage / resign
 lifecycle**: an older artifact can be re-signed with the
 current year's key without recompiling or modifying the
-upstream binary. The CI workflow runs `rpmsign --addsign`
-against the existing release asset to stamp a new
-signature header; the bytes inside the package are
-unchanged. The re-signed package is published as a new
-artifact, and both versions (original-signed-by-key-2025,
-re-signed-by-key-2027) remain in the release history.
+upstream binary. The CI workflow would run
+`rpmsign --addsign` against the existing release asset to
+stamp a new signature header; the bytes inside the package
+are unchanged. The re-signed package would be published as
+a new artifact, and both versions (original-signed-by-key-
+2025, re-signed-by-key-2027) remain in the release history.
 
-### Re-signing is handled on demand
+### Re-signing handled on demand
 
-Re-signed older builds are publicly hosted alongside the
-original-signed versions, so consumers can pick whichever
+Re-signed older builds would be publicly hosted alongside
+the original-signed versions, so consumers can pick whichever
 matches the keys they've imported.
 
-The team doesn't proactively re-sign every historical
+The team wouldn't proactively re-sign every historical
 artifact for every release cycle. Anyone can verify any
 historical artifact using the corresponding historical key
 from `keyring/archive/` — that's the GPG default and doesn't
@@ -174,21 +190,23 @@ artifacts to be re-signed through the team's support
 channels; whether and how fast a particular re-sign happens
 depends on the maintenance relationship with that customer.
 
-## How this maps to `index.tsv`
+## How this *would* map to `index.tsv` (illustrative)
 
-The two-key strategy lives entirely in this repo's
-manifest:
+The two-key design would live entirely in the repo's
+manifest. **The following table is illustrative only — no
+such rows exist in `index.tsv` today.** It's here to show
+what the schema would look like if the team adopted the
+design:
 
 ```tsv
 handle          uid              fingerprint    created     purpose
-official        Li Junhao …      AAAA…          2022-03-15  release-signing,package-signing
-key-2026        Li Junhao …      BBBB…          2026-01-04  package-signing-yearly
-key-2027        Li Junhao …      CCCC…          2027-01-04  package-signing-yearly
+official        <uid>            <fingerprint>  <date>      release-signing,package-signing
+key-2026        <uid>            <fingerprint>  <date>      package-signing-yearly
+key-2027        <uid>            <fingerprint>  <date>      package-signing-yearly
 ```
 
-(The above will populate as the team publishes each key.
-`key-2025` and earlier years would move to
-`keyring/archive/` once rotated.)
+Under this design, `key-2025` and earlier years would
+move to `keyring/archive/` once rotated.
 
 A consumer wanting to verify `x-cmd-annual-2026.rpm`:
 
@@ -225,3 +243,6 @@ rpm -K x-cmd-annual-2026.rpm
 - [6. Three ways to consume the keyring](./6-three-ways-to-consume.md) —
   raw curl, `x gpg`, and the GitHub-Pages-via-x-cmd.com
   redirect.
+- [7. Signing an RPM with GPG](./7-signing-an-rpm-with-gpg.md) —
+  the practical `rpmsign` tutorial that the repackage /
+  resign lifecycle above would invoke at release time.
