@@ -1,0 +1,23 @@
+# Local edits / backups
+*.bak
+*.swp
+*~
+
+# Local key material — never commit private keys.
+# The whole repo is for *public* keys; if a private key ever
+# lands here, it must be removed and the keypair considered
+# compromised. The .private-pattern below is a safety net:
+# it's never expected to match a real file, but if you slip
+# and `git add` a `something.private.asc`, this filter will
+# catch it on `git status`.
+*.private.asc
+*private-secret-key*
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editor noise (mostly covered by *~ / *.swp above; keep this
+# shortlist explicit so the intent is documented).
+.idea/
+.vscode/
