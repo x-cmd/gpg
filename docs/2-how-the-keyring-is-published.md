@@ -197,3 +197,33 @@ they do give you the audit trail.
   how the annual-isolation-key workflow plugs into the same pipeline.
 - [5. Verifying a key](./5-verifying-a-key.md) — the three-step
   fetch → import → compare recipe.
+
+## FAQ
+
+A subset of the central
+[FAQ in article 0](./0-x-cmd-gpg-overview.md#faq--software-distribution--code-signing-cryptography)
+most relevant to this article. The full 8-question set lives
+in article 0; the answers are reproduced there in a
+project-agnostic, industry-wide form.
+
+### Q4: What are the pros and cons of hardcoding a GPG key to "never expire"?
+
+The trade-off is between business continuity and
+blast-radius. No-expiry means historical artifacts keep
+verifying forever and CI/CD never needs to rotate keys —
+zero maintenance, no "key expired" outages on unattended
+hosts. The cost is that a private-key compromise gives
+attackers indefinite forging power; recovery depends on a
+revocation certificate that's notoriously hard to distribute
+after the fact. See article 0 for the full answer.
+
+### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
+
+The pattern is **Trust Anchor Registry**: keep a permanent
+public-key repository that combines every historical annual
+public key into a single keyring, and require enterprise
+systems to import both this year's and next year's keys.
+The system then has both historical and future keys; the
+audit decision of "should we forcibly invalidate the old
+key?" is left to each operator's own policy. See article 0
+for the full answer.

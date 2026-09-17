@@ -188,3 +188,31 @@ messages when a key rotates.
   redirect.
 - [3. Reading the key catalog](./3-reading-the-key-catalog.md) —
   fingerprint as a cryptographic commitment, in detail.
+
+## FAQ
+
+A subset of the central
+[FAQ in article 0](./0-x-cmd-gpg-overview.md#faq--software-distribution--code-signing-cryptography)
+most relevant to this article. The full 8-question set lives
+in article 0; the answers are reproduced there in a
+project-agnostic, industry-wide form.
+
+### Q1: GPG software vs. GPG Key — what's the technical relationship?
+
+GPG is the program that performs cryptographic operations;
+the keypair is the data credential that holds the
+cryptographic material. Verification uses only the public
+half of the keypair — the matching private key never needs
+to leave the publisher's infrastructure. See article 0 for
+the full answer.
+
+### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
+
+The standard pattern is **Trust Anchor Registry**: keep a
+permanent public-key repository combining every historical
+annual public key into a single keyring, and require
+verifiers to import the historical keys alongside the
+current. That way, an artifact signed by last year's key
+keeps verifying on hosts that only have this year's key
+imported — because they imported the historical keys at
+the same time. See article 0 for the full answer.

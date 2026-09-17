@@ -228,3 +228,80 @@ rpm -K x-cmd-annual-2026.rpm
 - [6. Three ways to consume the keyring](./6-three-ways-to-consume.md) —
   raw curl, `x gpg`, and the GitHub-Pages-via-x-cmd.com
   redirect.
+
+## FAQ
+
+This article sits squarely in the middle of the central
+FAQ's lifetime / rotation questions. The four most relevant
+items are reproduced below as a curated subset; the full
+8-question set lives in
+[article 0](./0-x-cmd-gpg-overview.md#faq--software-distribution--code-signing-cryptography)
+in a project-agnostic, industry-wide form.
+
+### Q4: What are the pros and cons of hardcoding a GPG key to "never expire"?
+
+The trade-off is between business continuity and blast
+radius. No-expiry means historical artifacts keep verifying
+forever and CI/CD never needs to rotate keys — zero
+maintenance, no "key expired" outages on unattended hosts.
+The cost is that a private-key compromise gives attackers
+indefinite forging power; recovery depends on a revocation
+certificate that's notoriously hard to distribute after the
+fact. This is exactly the trade-off the "no expiry
+cryptographically, annual rotation operationally" pattern
+attempts to split. See article 0 for the full answer.
+
+### Q5: Why have many historical certificates and keys had lifetimes of "398 days" or "397 days"?
+
+The 398 / 397-day numbers are tied to publicly-trusted Web
+certificates (SSL/TLS) — 398 days since 2020 is the
+CA/Browser-Forum-mandated maximum for one-year Web
+certificates (365 baseline + 33-day cross-year / multi-
+timezone buffer); 397 days is the engineering-practice
+defensive retreat to absorb a few hours of timezone drift
+on global scanners. These numbers don't apply to code
+signing — the CA/B Forum rules cover Web PKI, not package
+signing. Code signing typically uses 1- to 2-year long-term
+rotation. See article 0 for the full answer.
+
+### Q6: What changed for SSL/TLS certificates in 2026, and does code signing get affected?
+
+Since March 2026 publicly-trusted Web certificates are
+capped at under 200 days (heading toward ~100 days in 2027)
+— the goal is to eliminate long-term keys via automation.
+Code signing is explicitly carved out: international
+root-certificate programs and OS-level security-audit specs
+classify package signing and code signing as infrastructure
+anchors, exempt from the Web-certificate lifetime-reduction
+program. In the Linux-package-distribution and enterprise-
+compliance field, 1- to 2-year long-term key rotation
+remains the industry-mainstream practice. See article 0 for
+the full answer.
+
+### Q7: For commercial software adopting "1-year rotation" key isolation, what are the pros and cons?
+
+Pro side: high security and compliance — annual rotation
+aligns with the "Annual Security Audit" metric required by
+most financial and government-enterprise procurement; even if
+a year's private key leaks, the risk is fully contained to
+that single year. Con side: old-system compatibility
+friction — if old systems delete the old key at year
+boundary, historical-version software starts reporting
+errors during routine dependency scans; the dual-signing
+dilemma — embedding two keys (old + new) into the same RPM
+produces inconsistent behavior across distribution
+verification engines. The "Trust Anchor Registry" pattern in
+Q8 is the standard mitigation. See article 0 for the full
+answer.
+
+### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
+
+The standard pattern is **Trust Anchor Registry**: keep a
+permanent public-key repository combining all historical
+annual public keys into a single keyring, require enterprise
+systems to import both this year's and next year's keys,
+and leave the audit decision of "should we forcibly
+invalidate the old key?" to each operator's own policy. This
+is the mitigation that resolves the old-system-compatibility
+friction and dual-signing-dilemma problems from Q7. See
+article 0 for the full answer.

@@ -190,3 +190,27 @@ gpg --import /media/usb/keyring.asc
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) —— 维护者流
   程与政策
 - [`SKILL.md`](../SKILL.md) —— AI agent 用法
+
+## FAQ
+
+本节从
+[文章 0 的中心 FAQ](./0-x-cmd-gpg-overview.cn.md#faq--软件分发与代码签名密码学)
+里挑出与本文最相关的子集。完整的 8 问在文章 0，
+答案以行业普遍视角书写，与具体项目无关。
+
+### Q2：既然有了 Sigstore，为什么 RPM / DEB 依然高度依赖 GPG？
+
+`rpm --import` 与 `apt-key add` 是 GPG 原生命令 —— OS 级
+包管理器没有 Sigstore 校验模式。所以即便 Sigstore 在技术
+上有优势（无长期私钥管理、公开透明日志），OS 包分发的
+事实渠道仍是 GPG。本生态系统的消费者必须持有一份 GPG
+签名的 keyring 来引导信任。完整答案见文章 0。
+
+### Q8：采用"一年一换"密钥模型，工业界如何解决跨年过渡与历史回滚？
+
+标准模式是 **Trust Anchor Registry（信任锚点注册表）**：
+把每个历年年度公钥合并进单个 keyring，消费者导入一次后
+永久保留。这让"用哪种传输拉 keyring"（curl、shell 模
+块、GitHub Pages 经跳转、气隙环境的摆渡）的选择与
+"keyring 里有哪些密钥"正交 —— 无论怎么运输，历史密钥
+都跟着走。完整答案见文章 0。

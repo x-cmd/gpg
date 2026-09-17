@@ -183,3 +183,31 @@ before trusting the key.
   the long-form version of FAQ Q4–Q8.
 - [5. Verifying a key](./5-verifying-a-key.md) — the three-step
   fetch → import → compare recipe.
+
+## FAQ
+
+A subset of the central
+[FAQ in article 0](./0-x-cmd-gpg-overview.md#faq--software-distribution--code-signing-cryptography)
+most relevant to this article. The full 8-question set lives
+in article 0; the answers are reproduced there in a
+project-agnostic, industry-wide form.
+
+### Q1: GPG software vs. GPG Key — what's the technical relationship?
+
+It's the relationship between a software program (GPG, which
+performs the cryptographic operations) and a data credential
+(the keypair, which holds the cryptographic material). A
+catalog like `index.tsv` documents only the *public* half of
+each keypair — the half that's safe to publish. The matching
+private keys are held by the publisher. See article 0 for the
+full answer.
+
+### Q3: Why don't publishers usually distribute unsigned raw packages?
+
+A catalog that lists keys for *signed* packages only makes
+sense because signing is the de-facto baseline — unsigned
+distribution is rarely published because package managers
+refuse to install unsigned packages by default, and the
+MITM / poisoning surface is unacceptable. Catalog entries
+represent signed artifacts; their existence implies
+signing, not its absence. See article 0 for the full answer.

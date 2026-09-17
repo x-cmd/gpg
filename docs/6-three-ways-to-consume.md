@@ -213,3 +213,34 @@ in this repo are the technical reference:
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — maintainer
   pipeline and policy
 - [`SKILL.md`](../SKILL.md) — AI-agent recipe
+
+## FAQ
+
+A subset of the central
+[FAQ in article 0](./0-x-cmd-gpg-overview.md#faq--software-distribution--code-signing-cryptography)
+most relevant to this article. The full 8-question set lives
+in article 0; the answers are reproduced there in a
+project-agnostic, industry-wide form.
+
+### Q2: Sigstore exists now — why do RPM / DEB still rely on GPG?
+
+`rpm --import` and `apt-key add` are GPG-native commands —
+the OS-level package managers don't have a Sigstore
+verification mode. So even though Sigstore has technical
+advantages (no long-term private-key management, public
+transparency log), the de-facto distribution channel for
+OS packages remains GPG. Consumers in this ecosystem must
+have a GPG-signed keyring to bootstrap. See article 0 for
+the full answer.
+
+### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
+
+The standard pattern is **Trust Anchor Registry**: bundle
+every historical annual public key into a single keyring
+that consumers import once and keep installed. This makes
+the choice of "which transport to fetch the keyring from"
+(curl, shell module, GitHub-Pages-via-redirect, sneakernet
+for air-gapped environments) orthogonal to "which keys are
+in the keyring" — all historical keys travel together,
+regardless of how they're shipped. See article 0 for the
+full answer.
