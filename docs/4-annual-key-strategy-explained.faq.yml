@@ -1,0 +1,97 @@
+id: x-gpg-4-annual-key-strategy-explained
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: never-expire-pro-con
+        question:
+          en: What are the pros and cons of hardcoding a GPG key to "never expire"?
+        answer:
+          en: |
+            Trade-off between business continuity and blast radius.
+            No-expiry means historical artifacts keep verifying forever
+            and CI/CD never needs to rotate keys — zero maintenance, no
+            "key expired" outages on unattended hosts. The cost is
+            that a private-key compromise gives attackers indefinite
+            forging power, and recovery depends on a revocation
+            certificate that's notoriously hard to distribute after
+            the fact. This is exactly the trade-off the "no expiry
+            cryptographically, annual rotation operationally" pattern
+            attempts to split.
+        confidence: 9
+        reference:
+          - docs/4-annual-key-strategy-explained.en.md
+
+      - id: why-398-days
+        question:
+          en: Why have many historical certificates and keys had lifetimes of "398 days" or "397 days"?
+        answer:
+          en: |
+            Tied to publicly-trusted Web certificates (SSL/TLS) — 398
+            days since 2020 is the CA/Browser-Forum-mandated maximum
+            for one-year Web certificates (365 baseline + 33-day
+            cross-year / multi-timezone buffer); 397 days is the
+            engineering-practice defensive retreat to absorb a few
+            hours of timezone drift on global scanners. These numbers
+            don't apply to code signing — the CA/B Forum rules cover
+            Web PKI, not package signing.
+        confidence: 9
+        reference:
+          - docs/4-annual-key-strategy-explained.en.md
+
+      - id: ssl-tls-2026-changes
+        question:
+          en: What changed for SSL/TLS certificates in 2026, and does code signing get affected?
+        answer:
+          en: |
+            Since March 2026 publicly-trusted Web certificates are
+            capped at under 200 days (heading toward ~100 days in 2027)
+            — the goal is to eliminate long-term keys via automation.
+            Code signing is explicitly carved out: international
+            root-certificate programs and OS-level security-audit
+            specifications classify package signing and code signing
+            as infrastructure anchors, exempt from the Web-certificate
+            lifetime-reduction program.
+        confidence: 9
+        reference:
+          - docs/4-annual-key-strategy-explained.en.md
+
+      - id: annual-key-pro-con
+        question:
+          en: For commercial software adopting "1-year rotation" key isolation, what are the pros and cons?
+        answer:
+          en: |
+            Pro: high security and compliance — annual rotation aligns
+            with the "Annual Security Audit" metric required by most
+            financial and government-enterprise procurement; even if a
+            year's private key leaks, the risk is fully contained to
+            that single year.
+            Con: old-system compatibility friction — if old systems
+            delete the old key at year boundary, historical-version
+            software starts reporting errors during routine dependency
+            scans; dual-signing dilemma — embedding two keys (old + new)
+            into the same RPM produces inconsistent behavior across
+            distribution verification engines. The Trust Anchor Registry
+            pattern in Q8 is the standard mitigation.
+        confidence: 9
+        reference:
+          - docs/4-annual-key-strategy-explained.en.md
+
+      - id: annual-key-cross-year
+        question:
+          en: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
+        answer:
+          en: |
+            Standard pattern is Trust Anchor Registry, with the user's
+            own keyring as the lever: keep a permanent public-key
+            repository combining all historical annual public keys into
+            a single keyring, require consumer systems to import both
+            this year's and next year's keys, and leave the audit
+            decision of "should I forcibly invalidate the old key?"
+            to each operator's own policy. This is the mitigation that
+            resolves the old-system-compatibility friction and
+            dual-signing-dilemma problems.
+        confidence: 9
+        reference:
+          - docs/4-annual-key-strategy-explained.en.md

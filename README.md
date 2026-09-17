@@ -260,16 +260,19 @@ key) so there is no unsigned mirror to attack.
 
 ### Q4: Which package variants does x-cmd publish?
 
-Two signed artifacts per release, each with its own key:
+Two signed artifacts per release, each with its own key. The
+split exists because the two audiences have different needs —
+bundling them into a single key would force one audience to
+accept the other's trade-offs.
 
 1. **`x-cmd.rpm` / `x-cmd.deb`** — community edition. Signed
    with the team's unrestricted master key. One import, every
-   future upgrade verifies silently with zero ongoing admin.
+   future upgrade verifies.
 2. **`x-cmd-annual-<year>.rpm` / `x-cmd-annual-<year>.deb`** —
-   enterprise / compliance edition. Signed with that year's
-   isolation key (e.g. `key-2026`). Targeted at finance and
-   government procurement teams that require strict year-on-year
-   asset isolation in their audit trails.
+   annual edition. Signed with that year's isolation key
+   (e.g. `key-2026`). Targets customers who need strict year-
+   on-year asset isolation in their audit trails (commonly:
+   finance and government procurement).
 
 ### Q5: Why "no expiry" cryptographically but "annual rotation" operationally?
 
@@ -342,11 +345,16 @@ modifying the upstream binary. The CI workflow runs
 stamp a new signature header; the bytes inside the package are
 unchanged.
 
-The re-signed packages are publicly hosted (transparency is
-part of the value proposition), but **which historic versions**
-re-sign and **how often** is a service-tier decision — the team
-does not maintain re-signed older builds for free users. Long-
-term-support re-signing is a paid LTS subscription feature.
+The re-signed packages are publicly hosted alongside the
+original-signed versions, so consumers can pick whichever
+matches their installed keys. **Which historic versions** to
+re-sign and **how often** is a service-design choice; the team
+doesn't proactively re-sign every historical artifact for
+every release. Free users verify historical artifacts with the
+historical keys (permanently available in `keyring/archive/`);
+users who want the team to do the re-signing on demand can
+request specific artifacts through the team's support
+channels.
 
 ### Q9: Why `x-cmd/gpg` and not `x-cmd/gpgkeyring`?
 

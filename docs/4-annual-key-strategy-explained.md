@@ -1,6 +1,6 @@
 ---
 x-title: Annual key strategy explained
-x-desc: The long-form version of FAQ Q4–Q8 — the two published keys (community + annual enterprise), why "no expiry" cryptographically but "annual rotation" operationally, the repackage / resign lifecycle, and the LTS economics.
+x-desc: The long-form version of FAQ Q4–Q8 — the two published keys (community + annual), why "no expiry" cryptographically but "annual rotation" operationally, and the repackage / resign lifecycle for users who need an older artifact re-signed with the current year's key.
 x-sidebar: Annual key strategy explained
 x-keywords: annual key, enterprise, supply chain, no-expiry, rotation, repackage, resign, lts, annual isolation, key-2026
 x-json-ld:
@@ -140,13 +140,13 @@ their own hosts — the team takes no position on it. The
 "incompatibility-with-your-compliance" pot belongs to the
 operator who made the choice.
 
-## Repackage / resign lifecycle (LTS customers)
+## Repackage / resign lifecycle
 
-A paying enterprise customer in 2027 wants to install a
-2025-era artifact. The artifact's original signature was
-made by `key-2025`, which they may or may not have
-imported. Even if they have it, they may want the artifact
-re-signed under `key-2027` so their 2027 audit log is clean.
+An enterprise customer in 2027 wants to install a 2025-era
+artifact. The artifact's original signature was made by
+`key-2025`, which they may or may not have imported. Even
+if they have it, they may want the artifact re-signed under
+`key-2027` so their 2027 audit log is clean.
 
 The team supports this through **repackage / resign
 lifecycle**: an older artifact can be re-signed with the
@@ -158,24 +158,21 @@ unchanged. The re-signed package is published as a new
 artifact, and both versions (original-signed-by-key-2025,
 re-signed-by-key-2027) remain in the release history.
 
-### What's free vs what's paid
+### Re-signing is handled on demand
 
-Re-signed older builds are publicly hosted (transparency
-is part of the value proposition). However, **which historic
-versions re-sign and how often** is a service-tier decision.
-The team does not maintain re-signed older builds for free
-users. Long-term-support re-signing is a paid LTS
-subscription feature — finance / government customers
-contractually paying for the right to ask "please re-sign
-this artifact from 2024 with this year's key".
+Re-signed older builds are publicly hosted alongside the
+original-signed versions, so consumers can pick whichever
+matches the keys they've imported.
 
-The pricing line is intentional: free users can verify any
-historical artifact as long as they have the corresponding
-historical key (which we keep in `keyring/archive/`
-permanently), and paid LTS users get the convenience of
-"every artifact carries a signature from the key I'm
-currently using" without managing a per-year key inventory
-themselves.
+The team doesn't proactively re-sign every historical
+artifact for every release cycle. Anyone can verify any
+historical artifact using the corresponding historical key
+from `keyring/archive/` — that's the GPG default and doesn't
+require any action from the team. Customers who want the
+team to take on the re-signing labor can request specific
+artifacts to be re-signed through the team's support
+channels; whether and how fast a particular re-sign happens
+depends on the maintenance relationship with that customer.
 
 ## How this maps to `index.tsv`
 
@@ -228,82 +225,3 @@ rpm -K x-cmd-annual-2026.rpm
 - [6. Three ways to consume the keyring](./6-three-ways-to-consume.md) —
   raw curl, `x gpg`, and the GitHub-Pages-via-x-cmd.com
   redirect.
-
-## FAQ
-
-This article sits squarely in the middle of the central
-FAQ's lifetime / rotation questions. The four most relevant
-items are reproduced below as a curated subset; the full
-8-question set lives in
-[article 0](./0-x-cmd-gpg-overview.md#faq--software-distribution--code-signing-cryptography)
-in a project-agnostic, industry-wide form.
-
-### Q4: What are the pros and cons of hardcoding a GPG key to "never expire"?
-
-The trade-off is between business continuity and blast
-radius. No-expiry means historical artifacts keep verifying
-forever and CI/CD never needs to rotate keys — zero
-maintenance, no "key expired" outages on unattended hosts.
-The cost is that a private-key compromise gives attackers
-indefinite forging power; recovery depends on a revocation
-certificate that's notoriously hard to distribute after the
-fact. This is exactly the trade-off the "no expiry
-cryptographically, annual rotation operationally" pattern
-attempts to split. See article 0 for the full answer.
-
-### Q5: Why have many historical certificates and keys had lifetimes of "398 days" or "397 days"?
-
-The 398 / 397-day numbers are tied to publicly-trusted Web
-certificates (SSL/TLS) — 398 days since 2020 is the
-CA/Browser-Forum-mandated maximum for one-year Web
-certificates (365 baseline + 33-day cross-year / multi-
-timezone buffer); 397 days is the engineering-practice
-defensive retreat to absorb a few hours of timezone drift
-on global scanners. These numbers don't apply to code
-signing — the CA/B Forum rules cover Web PKI, not package
-signing. Code signing typically uses 1- to 2-year long-term
-rotation. See article 0 for the full answer.
-
-### Q6: What changed for SSL/TLS certificates in 2026, and does code signing get affected?
-
-Since March 2026 publicly-trusted Web certificates are
-capped at under 200 days (heading toward ~100 days in 2027)
-— the goal is to eliminate long-term keys via automation.
-Code signing is explicitly carved out: international
-root-certificate programs and OS-level security-audit specs
-classify package signing and code signing as infrastructure
-anchors, exempt from the Web-certificate lifetime-reduction
-program. In the Linux-package-distribution and enterprise-
-compliance field, 1- to 2-year long-term key rotation
-remains the industry-mainstream practice. See article 0 for
-the full answer.
-
-### Q7: For commercial software adopting "1-year rotation" key isolation, what are the pros and cons?
-
-Pro side: high security and compliance — annual rotation
-aligns with the "Annual Security Audit" metric required by
-most financial and government-enterprise procurement; even if
-a year's private key leaks, the risk is fully contained to
-that single year. Con side: old-system compatibility
-friction — if old systems delete the old key at year
-boundary, historical-version software starts reporting
-errors during routine dependency scans; the dual-signing
-dilemma — embedding two keys (old + new) into the same RPM
-produces inconsistent behavior across distribution
-verification engines. The "Trust Anchor Registry" pattern in
-Q8 is the standard mitigation. See article 0 for the full
-answer.
-
-### Q8: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
-
-The standard pattern is **Trust Anchor Registry**, with the
-*user's own keyring* as the lever: a publisher-maintained
-data path bundles all historical annual public keys into a
-single keyring; the consumer imports the bundle into their
-own `gpg` and now holds both this year's and next year's
-keys locally; the audit decision of "should I keep this
-key, delete it, or rotate on my own schedule?" sits with
-the user, since the local `gpg` keyring is theirs. This is
-the mitigation that resolves the old-system-compatibility
-friction and dual-signing-dilemma problems from Q7. See
-article 0 for the full answer.

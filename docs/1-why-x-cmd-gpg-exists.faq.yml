@@ -1,0 +1,49 @@
+id: x-gpg-1-why-x-cmd-gpg-exists
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: what-is-gpg-vs-key
+        question:
+          en: GPG software vs. GPG Key — what's the technical relationship?
+        answer:
+          en: |
+            It's the relationship between a software program and a data
+            credential. GPG is the program; the keypair is the data
+            credential. GPG without keys has nothing to encrypt with; keys
+            without GPG have nothing that can perform the operations.
+        confidence: 9
+        reference:
+          - docs/1-why-x-cmd-gpg-exists.en.md
+
+      - id: why-rpm-deb-still-gpg
+        question:
+          en: Sigstore exists now — why do RPM / DEB still rely on GPG?
+        answer:
+          en: |
+            Historical compatibility with the OS-native toolchain. RPM
+            (dnf / yum) and DEB (apt) verification engines were designed
+            with deep OpenPGP integration from day one and remain 100%
+            dependent on GPG keys; Sigstore is widely adopted in
+            cloud-native contexts but does not replace GPG in the
+            OS-package channel. The two ecosystems co-exist.
+        confidence: 9
+        reference:
+          - docs/1-why-x-cmd-gpg-exists.en.md
+
+      - id: why-not-unsigned
+        question:
+          en: Why don't publishers usually distribute unsigned raw packages?
+        answer:
+          en: |
+            Two main disadvantages tip the balance against unsigned
+            distribution: network transmission and CDN nodes lack
+            cryptographic tamper protection (MITM and package poisoning
+            become trivial), and most Linux package managers refuse to
+            install unsigned packages by default. The advantages (zero
+            key-management overhead, offline re-signing) don't outweigh
+            those in practice.
+        confidence: 9
+        reference:
+          - docs/1-why-x-cmd-gpg-exists.en.md

@@ -1,0 +1,149 @@
+id: x-gpg-0-x-cmd-gpg-overview
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: what-is-gpg-vs-key
+        question:
+          en: GPG software vs. GPG Key — what's the technical relationship?
+        answer:
+          en: |
+            It's the relationship between a software program and a data credential.
+            GPG (GNU Privacy Guard) is an open-source encryption program implementing
+            the OpenPGP international standard — it performs the concrete computational
+            actions (encryption, decryption, signature generation, signature
+            verification). A GPG Key (keypair) is the data credential the software
+            consumes — a publicly-shareable public key plus a strictly confidential
+            private key. GPG without keys has nothing to encrypt with; keys without
+            GPG have nothing that can perform the operations.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md
+
+      - id: why-rpm-deb-still-gpg
+        question:
+          en: Sigstore exists now — why do RPM / DEB still rely on GPG?
+        answer:
+          en: |
+            Historical compatibility with the OS-native toolchain. Sigstore is
+            widely adopted in modern cloud-native environments (Docker images,
+            Kubernetes components, npm / PyPI) — short-lived ephemeral
+            certificates plus a transparency log (Rekor) eliminate long-term
+            private-key management. RPM (dnf / yum) and DEB (apt) are the
+            native base package managers of mainstream Linux distributions;
+            their verification engines were designed with deep OpenPGP
+            integration from day one and remain 100% dependent on GPG keys
+            for package signing. The two ecosystems co-exist; for OS-level
+            packages the de-facto channel is still GPG.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md
+
+      - id: why-not-unsigned
+        question:
+          en: Why don't publishers usually distribute unsigned raw packages?
+        answer:
+          en: |
+            Two main disadvantages tip the balance against unsigned distribution.
+            Pro side: zero key-management overhead, offline re-signing.
+            Con side: network transmission and CDN nodes lack cryptographic
+            tamper protection (MITM and package poisoning become trivial);
+            most Linux package managers pop up an error and refuse to install
+            unsigned packages by default. The advantages don't outweigh
+            those in practice.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md
+
+      - id: never-expire-pro-con
+        question:
+          en: What are the pros and cons of hardcoding a GPG key to "never expire"?
+        answer:
+          en: |
+            Trade-off between business continuity and blast radius.
+            Pro: extreme business continuity (servers deployed years ago keep
+            verifying without "key expired" outages on unattended hosts);
+            very low maintenance cost (no annual rotation, no end-user
+            announcements).
+            Con: unlimited blast radius if the private key leaks — attackers
+            can forge future versions indefinitely, and recovery depends on
+            a revocation certificate that's notoriously hard to distribute
+            after the fact.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md
+
+      - id: why-398-days
+        question:
+          en: Why have many historical certificates and keys had lifetimes of "398 days" or "397 days"?
+        answer:
+          en: |
+            These numbers trace to mandatory lifetime limits imposed by the
+            CA/Browser Forum, Apple, and Google on publicly-trusted Web
+            certificates (SSL/TLS). 398 days since 2020 is the maximum for
+            one-year Web certificates (365 baseline + 33 days of cross-year /
+            multi-timezone buffer). 397 days is the engineering-practice
+            defensive retreat to absorb a few hours of timezone drift on
+            global scanners. These numbers don't apply to code signing —
+            the CA/B Forum rules cover Web PKI, not package signing.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md
+
+      - id: ssl-tls-2026-changes
+        question:
+          en: What changed for SSL/TLS certificates in 2026, and does code signing get affected?
+        answer:
+          en: |
+            Since March 2026 publicly-trusted Web certificates are capped at
+            under 200 days (heading toward ~100 days in 2027) — the goal is
+            to eliminate long-term keys via automation. Code signing is
+            explicitly carved out: international root-certificate programs and
+            OS-level security-audit specifications classify package signing
+            and code signing as infrastructure anchors, exempt from the
+            Web-certificate lifetime-reduction program. In the
+            Linux-package-distribution and enterprise-compliance field, 1- to
+            2-year long-term key rotation remains the industry-mainstream
+            practice.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md
+
+      - id: annual-key-pro-con
+        question:
+          en: For commercial software adopting "1-year rotation" key isolation, what are the pros and cons?
+        answer:
+          en: |
+            Pro: high security and compliance — annual rotation aligns with
+            the "Annual Security Audit" metric required by most financial and
+            government-enterprise procurement; even if a year's private key
+            leaks, the risk is fully contained to that single year of versions.
+            Con: old-system compatibility friction — if old systems delete
+            the old key at year boundary, historical-version software starts
+            reporting errors during routine dependency scans due to missing
+            signature source; dual-signing dilemma — embedding two keys (old
+            + new) into the same RPM produces inconsistent behavior across
+            distribution verification engines.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md
+
+      - id: annual-key-cross-year
+        question:
+          en: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
+        answer:
+          en: |
+            The pattern is Trust Anchor Registry, with the user's own keyring
+            as the lever. A publisher-maintained data path bundles all
+            historical annual public keys (key-2025.gpg, key-2026.gpg, …)
+            into a single keyring; the consumer imports the bundle into
+            their own gpg and now holds both historical and future keys
+            locally. From here, the user owns the supply chain: their gpg
+            keyring is theirs, and the policy of "always keep old keys",
+            "delete at year boundary", or "rotate on your own schedule" is
+            theirs to set. The publisher's only role is to publish the
+            bytes; the user decides the policy.
+        confidence: 9
+        reference:
+          - docs/0-x-cmd-gpg-overview.en.md

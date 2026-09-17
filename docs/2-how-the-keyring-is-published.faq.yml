@@ -1,0 +1,36 @@
+id: x-gpg-2-how-the-keyring-is-published
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: never-expire-pro-con
+        question:
+          en: What are the pros and cons of hardcoding a GPG key to "never expire"?
+        answer:
+          en: |
+            Trade-off between business continuity and blast radius.
+            No-expiry means historical artifacts keep verifying forever
+            and CI/CD never needs to rotate keys. The cost is that a
+            private-key compromise gives attackers indefinite forging
+            power, and recovery depends on a revocation certificate
+            that's notoriously hard to distribute after the fact.
+        confidence: 9
+        reference:
+          - docs/2-how-the-keyring-is-published.en.md
+
+      - id: annual-key-cross-year
+        question:
+          en: If "1-year rotation" is adopted, how does industry solve cross-year transition and historical rollback?
+        answer:
+          en: |
+            The pattern is Trust Anchor Registry, with the user's own
+            keyring as the lever. A publisher-maintained data path
+            bundles all historical annual public keys into a single
+            keyring; the consumer imports the bundle into their own gpg
+            and now holds both historical and future keys locally. From
+            here, the user owns the supply chain: their gpg keyring is
+            theirs, and the policy is theirs to set.
+        confidence: 9
+        reference:
+          - docs/2-how-the-keyring-is-published.en.md

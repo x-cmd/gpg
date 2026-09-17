@@ -1,0 +1,38 @@
+id: x-gpg-7-signing-an-rpm-with-gpg
+
+<data>:
+  - name:
+      en: software-distribution-and-code-signing
+    qa:
+      - id: what-is-gpg-vs-key
+        question:
+          en: GPG software vs. GPG Key — what's the technical relationship?
+        answer:
+          en: |
+            This article exercises both: the gpg program (which
+            rpmsign shells out to for the cryptographic operations)
+            and the keypair (which holds the cryptographic material
+            the program operates on). Importing the team's signing
+            private key into your local GPG keyring is the data-side
+            prerequisite for rpmsign to find a key to sign with.
+        confidence: 9
+        reference:
+          - docs/7-signing-an-rpm-with-gpg.en.md
+
+      - id: why-not-unsigned
+        question:
+          en: Why don't publishers usually distribute unsigned raw packages?
+        answer:
+          en: |
+            Because dnf / yum / rpm will refuse to install unsigned
+            RPMs by default, and unsigned distribution has no
+            cryptographic tamper protection during transit. The
+            signing workflow in this article is the standard
+            mitigation: produce the package, stamp it with
+            rpmsign --addsign before publishing, and the consumer's
+            rpm -K will return OK. The --addsign operation is what
+            binds the cryptographic identity (the team's keypair) to
+            the bytes (the RPM file).
+        confidence: 9
+        reference:
+          - docs/7-signing-an-rpm-with-gpg.en.md
