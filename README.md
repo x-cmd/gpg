@@ -170,21 +170,37 @@ publishing the public half only, with the `purpose` column
 in `index.tsv` documenting *what* each key signs. For the
 broader trust-policy document, see the team's site.
 
-**Can I host a mirror, or operate a CDN / proxy that re-serves
-this repo?**
-**No, not without prior written permission.** This repo and
-the team site are the only authorized sources. Third-party
-mirrors, CDN / reverse-proxy / caching-proxy re-serving
-(jsdelivr, gcore, statically, or any service that
-automatically proxies raw.githubusercontent.com), public
-keyserver uploads (keys.openpgp.org, keyserver.ubuntu.com,
-etc.), and bundling into other packages are explicitly
-forbidden by [`LICENSE`](./LICENSE). The reason is the
-trust-anchor problem: a mirror or proxy that serves a
-substituted fingerprint silently breaks every consumer that
-trusts it; even an honest CDN cache returns stale bytes
-during a key rotation. Pin your tooling to GitHub and fetch
-directly every time.
+**Can I host a mirror, or trust a CDN / proxy / public keyserver
+to redistribute these keys?**
+That's a judgment you make, not something we dictate.
+
+Here's what we *do* say, definitively: **`github.com/x-cmd/gpg`**
+is the canonical source — the place the team actually
+maintains and pushes. **`https://x-cmd.com/gpg/`** is a
+presentation layer built at deploy time *from this GitHub
+repo*: the team's build pipeline fetches the keyring bytes
+from GitHub and serves them under the team domain, so short
+URLs like `rpm --import https://x-cmd.com` work without
+typos. There's one source of truth, presented two ways. If
+you see the keys served from either of those, you've got the
+bytes we published.
+
+Here's what we *don't* claim: control over anyone else's
+copy. GPG culture is inherently distributed — anyone with
+the bytes can mirror them on a third-party server, upload
+them to `keys.openpgp.org`, ship them through a CDN like
+jsdelivr, bundle them into another package, etc. Once we've
+published, the keys are out in the world; that's the design.
+
+Here's what we *don't do*: tell you what to trust. If your
+threat model says "only direct from the team's official
+channels", pin to GitHub + `x-cmd.com` and refuse anything
+else. If your threat model says "a well-known public keyserver
+is fine", fetch from `keys.openpgp.org`. If your threat model
+says "the CDN is faster and the bytes are good enough",
+fetch from jsdelivr. All three are valid choices — the keys
+are the same bytes. We just identify what *we* publish; you
+decide what to verify against.
 
 ## FAQ — supply chain & commercial deployment
 
