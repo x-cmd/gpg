@@ -399,7 +399,7 @@ Sigstore 2023 年从 CNCF 毕业，目前在以下场景生产使用：
 
 ## 延伸阅读
 
-- [0. x-cmd/gpg overview](./0-x-cmd-gpg-overview.md) ——
+- [0. x-cmd/gpg overview](./0-x-cmd-gpg-overview.en.md) ——
   本仓库是什么与维护政策。
 - [1. 什么是 GPG，怎么用？](./1-what-is-gpg-and-how-do-i-use-it.cn.md) ——
   终端用户入门；fingerprint 是信任锚。

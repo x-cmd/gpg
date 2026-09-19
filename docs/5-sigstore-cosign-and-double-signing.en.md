@@ -500,14 +500,14 @@ A few things to keep in mind:
 
 ## Where to read next
 
-- [0. x-cmd/gpg overview](./0-x-cmd-gpg-overview.md) — what
+- [0. x-cmd/gpg overview](./0-x-cmd-gpg-overview.en.md) — what
   this repo is and the maintenance policy.
-- [1. What is GPG and how do I use it?](./1-what-is-gpg-and-how-do-i-use-it.md) —
+- [1. What is GPG and how do I use it?](./1-what-is-gpg-and-how-do-i-use-it.en.md) —
   end-user introduction; fingerprint as the trust anchor.
-- [3. Annual key strategy](./3-annual-key-strategy-explained.md) —
+- [3. Annual key strategy](./3-annual-key-strategy-explained.en.md) —
   long-term GPG key rotation trade-offs; pairs with the
   Sigstore layer if you adopt double-signing.
-- [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.md) —
+- [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.en.md) —
   ™/® in UIDs; brand-defense work goes elsewhere.
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — release-side
   pipeline conventions once a signing strategy has been

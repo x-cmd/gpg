@@ -80,7 +80,7 @@ What we *don't* do:
   proxy-redistribution clause.
 - **We don't take a position on whether you should keep
   old keys on your host.** That's a user-side decision;
-  see [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.md)
+  see [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.en.md)
   for the philosophy.
 
 ## What is GPG, briefly
@@ -284,11 +284,11 @@ transitions.
 
 ## Where to read next
 
-- [3. Annual key strategy](./3-annual-key-strategy-explained.md) —
+- [3. Annual key strategy](./3-annual-key-strategy-explained.en.md) —
   the team's long-term GPG key rotation strategy
   (community master + annual isolation key).
-- [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.md) —
+- [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.en.md) —
   ™/® in UID, fingerprint-as-anchor.
-- [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.md) —
+- [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.en.md) —
   the modern alternative for cloud-native supply chains,
   and the case for double-signing both.

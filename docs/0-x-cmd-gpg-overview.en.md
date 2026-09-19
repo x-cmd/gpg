@@ -60,7 +60,7 @@ repo under [`keyring/`](../keyring/), aggregated into
 rationale — why this split, why "no expiry" cryptographically
 but "annual rotation" operationally, the repackage / resign
 lifecycle — lives in
-[4. Annual key strategy — design exploration](./3-annual-key-strategy-explained.md).
+[4. Annual key strategy — design exploration](./3-annual-key-strategy-explained.en.md).
 
 ## How to consume (three paths)
 
@@ -85,19 +85,19 @@ reverse proxy, or caching service — see
 
 ## Read next
 
-- [1. Why x-cmd/gpg exists](./1-what-is-gpg-and-how-do-i-use-it.md) — the
+- [1. Why x-cmd/gpg exists](./1-what-is-gpg-and-how-do-i-use-it.en.md) — the
   supply-chain problem this repo solves
 - [2. How the keyring is published](./2-publishing-your-own-gpg-keyring.md) —
   the team-internal pipeline from a fresh `gpg --export` to a
   row in `index.tsv`
-- [3. Reading the key catalog](./1-what-is-gpg-and-how-do-i-use-it.md) —
+- [3. Reading the key catalog](./1-what-is-gpg-and-how-do-i-use-it.en.md) —
   every column of `index.tsv`, fingerprint math, why pin to
   fingerprint
-- [4. Annual key strategy explained](./3-annual-key-strategy-explained.md) —
+- [4. Annual key strategy explained](./3-annual-key-strategy-explained.en.md) —
   the long-form version of FAQ Q4–Q8
-- [5. Verifying a key](./1-what-is-gpg-and-how-do-i-use-it.md) — the three-step
+- [5. Verifying a key](./1-what-is-gpg-and-how-do-i-use-it.en.md) — the three-step
   fetch → import → compare recipe
-- [6. Three ways to consume the keyring](./1-what-is-gpg-and-how-do-i-use-it.md) —
+- [6. Three ways to consume the keyring](./1-what-is-gpg-and-how-do-i-use-it.en.md) —
   raw curl, `x gpg`, and the GitHub-Pages-via-x-cmd.com redirect
 
 For the technical reference (file layout, schema, CI), see

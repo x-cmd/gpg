@@ -40,7 +40,7 @@ the feedback.
 By the end of this article you should be able to:
 
 - Generate a keypair with `gpg --gen-key` and pick a UID
-  (see [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.md)
+  (see [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.en.md)
   for how to write the UID string).
 - Export the public half to `keyring/<handle>.asc` and
   append a row to `index.tsv`.
@@ -49,7 +49,7 @@ By the end of this article you should be able to:
   commit (`git commit -S`), and a git tag (`git tag -s`).
 - Verify each signing afterwards (locally and via the
   transparency log if you also sign with Sigstore — see
-  [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.md)).
+  [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.en.md)).
 
 ## File layout you'll produce
 
@@ -521,11 +521,11 @@ file list), when (the release tag).
 
 ## What to read next
 
-- [3. Annual key strategy](./3-annual-key-strategy-explained.md) —
+- [3. Annual key strategy](./3-annual-key-strategy-explained.en.md) —
   long-term GPG key rotation trade-offs; pairs with the
   release pipeline.
-- [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.md) —
+- [4. GPG UID naming conventions](./4-gpg-uid-naming-conventions.en.md) —
   how to pick the UID string for your key.
-- [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.md) —
+- [5. Sigstore, Cosign, and double-signing](./5-sigstore-cosign-and-double-signing.en.md) —
   the modern alternative for cloud-native supply chains,
   and the case for double-signing both.

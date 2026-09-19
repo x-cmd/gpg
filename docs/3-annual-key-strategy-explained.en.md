@@ -237,10 +237,10 @@ rpm -K x-cmd-annual-2026.rpm
 
 ## What to read next
 
-- [5. Verifying a key](./1-what-is-gpg-and-how-do-i-use-it.md) — the three-step
+- [5. Verifying a key](./1-what-is-gpg-and-how-do-i-use-it.en.md) — the three-step
   fetch → import → compare recipe, with the look-alike and
   CDN-cache pitfalls called out.
-- [6. Three ways to consume the keyring](./1-what-is-gpg-and-how-do-i-use-it.md) —
+- [6. Three ways to consume the keyring](./1-what-is-gpg-and-how-do-i-use-it.en.md) —
   raw curl, `x gpg`, and the GitHub-Pages-via-x-cmd.com
   redirect.
 - [7. Signing an RPM with GPG](./2-publishing-your-own-gpg-keyring.md) —

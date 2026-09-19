@@ -235,9 +235,9 @@ isn't large enough to offset it.
 
 ## Where to read next
 
-- [1. What is GPG and how do I use it?](./1-what-is-gpg-and-how-do-i-use-it.md) —
+- [1. What is GPG and how do I use it?](./1-what-is-gpg-and-how-do-i-use-it.en.md) —
   end-user perspective; fingerprint as the trust anchor.
-- [3. Annual key strategy](./3-annual-key-strategy-explained.md) —
+- [3. Annual key strategy](./3-annual-key-strategy-explained.en.md) —
   long-term key rotation trade-offs.
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — how a key gets
   published once you've chosen a UID convention.
